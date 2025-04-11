@@ -1,4 +1,3 @@
-
 import { toast } from "sonner";
 
 type EmailData = {
@@ -19,7 +18,7 @@ export const sendEmail = async (data: EmailData): Promise<boolean> => {
     console.log('Subject:', data.subject);
     console.log('Body:', data.body);
     
-    // Alternative 1: Use a form submission service like Formspree
+    // Using Formspree - a built-in email notification service
     // This approach doesn't require API keys in your frontend code
     const response = await fetch("https://formspree.io/f/YOUR_FORMSPREE_ID", {
       method: "POST",
@@ -29,7 +28,9 @@ export const sendEmail = async (data: EmailData): Promise<boolean> => {
       body: JSON.stringify({
         email: data.to,
         subject: data.subject,
-        message: data.body
+        message: data.body,
+        _subject: `Demo Reel Submission - ${new Date().toLocaleDateString()}`,
+        _replyto: "no-reply@cicospace.com",
       })
     });
     
