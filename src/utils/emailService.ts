@@ -56,6 +56,7 @@ export const formatEmailBody = (formData: any): string => {
   body += `Email: ${formData.email}\n`;
   body += `Cell Phone: ${formData.cellPhone}\n`;
   body += `Website: ${formData.website}\n`;
+  body += `Problem Solved: ${formData.problemSolved}\n`;
   
   // Project Preferences
   body += `\n== PROJECT PREFERENCES ==\n`;

@@ -26,6 +26,7 @@ type FormState = {
   email: string;
   cellPhone: string;
   website: string;
+  problemSolved: string;
   
   tones: string[];
   otherTone: string;
@@ -55,6 +56,7 @@ const initialFormState: FormState = {
   email: '',
   cellPhone: '',
   website: '',
+  problemSolved: '',
   
   tones: [],
   otherTone: '',
@@ -135,6 +137,9 @@ const SubmissionForm: React.FC = () => {
         } else if (!formState.website) {
           isValid = false;
           errorMessage = 'Please enter your website or enter N/A if not applicable.';
+        } else if (!formState.problemSolved) {
+          isValid = false;
+          errorMessage = 'Please describe what problem you solve.';
         }
         break;
       case 2:
@@ -327,6 +332,17 @@ const SubmissionForm: React.FC = () => {
                   required
                 />
                 <p className="text-sm text-gray-500 mt-1">Enter your website URL or N/A if you don't have one.</p>
+              </div>
+              
+              <div>
+                <Label className="input-label">What Problem Do You Solve? *</Label>
+                <Textarea
+                  value={formState.problemSolved}
+                  onChange={(e) => updateForm('problemSolved', e.target.value)}
+                  placeholder="Describe the core problem your business/speaking solves for your audience..."
+                  className="text-input h-24"
+                  required
+                />
               </div>
             </div>
           </div>
