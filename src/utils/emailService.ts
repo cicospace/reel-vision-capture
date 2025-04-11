@@ -1,3 +1,4 @@
+
 import { toast } from "sonner";
 
 type EmailData = {
@@ -20,7 +21,7 @@ export const sendEmail = async (data: EmailData): Promise<boolean> => {
     
     // Using Formspree - a built-in email notification service
     // This approach doesn't require API keys in your frontend code
-    const response = await fetch("https://formspree.io/f/YOUR_FORMSPREE_ID", {
+    const response = await fetch("https://formspree.io/f/mldjazoy", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
