@@ -82,7 +82,6 @@ const toneOptions = [
   { id: 'inspirational', label: 'Inspirational' },
   { id: 'energetic', label: 'Energetic' },
   { id: 'authoritative', label: 'Authoritative' },
-  { id: 'other', label: 'Other' },
 ];
 
 const durationOptions = [
@@ -346,11 +345,11 @@ const SubmissionForm: React.FC = () => {
             </div>
             
             <div className="space-y-6">
-              <CheckboxGroup
+              <RadioGroupCustom
                 label="Which tones best represent your brand? *"
                 options={toneOptions}
-                selectedOptions={formState.tones}
-                onChange={(value) => updateForm('tones', value)}
+                value={formState.tones.length > 0 ? formState.tones[0] : ''}
+                onChange={(value) => updateForm('tones', [value])}
                 otherOption={true}
                 otherValue={formState.otherTone}
                 onOtherChange={(value) => updateForm('otherTone', value)}
