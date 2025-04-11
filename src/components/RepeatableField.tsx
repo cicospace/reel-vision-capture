@@ -17,13 +17,15 @@ type RepeatableFieldProps = {
   onChange: (items: ReelExample[]) => void;
   maxItems?: number;
   label: string;
+  required?: boolean;
 };
 
 const RepeatableField: React.FC<RepeatableFieldProps> = ({
   items,
   onChange,
   maxItems = 3,
-  label
+  label,
+  required = false
 }) => {
   const addItem = () => {
     if (items.length < maxItems) {
@@ -43,6 +45,13 @@ const RepeatableField: React.FC<RepeatableFieldProps> = ({
     );
   };
 
+  // If required and there are no items, add one
+  React.useEffect(() => {
+    if (required && items.length === 0) {
+      addItem();
+    }
+  }, [required]);
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -54,29 +63,32 @@ const RepeatableField: React.FC<RepeatableFieldProps> = ({
         <div key={item.id} className="p-4 border rounded-md bg-gray-50 space-y-3">
           <div className="flex justify-between items-center">
             <h4 className="font-medium">Example {index + 1}</h4>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => removeItem(item.id)}
-              className="h-8 px-2 text-red-500 hover:text-red-700 hover:bg-red-50"
-            >
-              <Trash2 size={16} />
-            </Button>
+            {items.length > 1 && (
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => removeItem(item.id)}
+                className="h-8 px-2 text-red-500 hover:text-red-700 hover:bg-red-50"
+              >
+                <Trash2 size={16} />
+              </Button>
+            )}
           </div>
           
           <div>
-            <Label htmlFor={`link-${item.id}`} className="text-sm">Demo Reel Link</Label>
+            <Label htmlFor={`link-${item.id}`} className="text-sm">Demo Reel Link *</Label>
             <Input
               id={`link-${item.id}`}
               value={item.link}
               onChange={(e) => updateItem(item.id, 'link', e.target.value)}
               placeholder="Paste demo reel URL here"
               className="mt-1"
+              required={required}
             />
           </div>
           
           <div>
-            <Label htmlFor={`comment-${item.id}`} className="text-sm">What do you like about it?</Label>
+            <Label htmlFor={`comment-${item.id}`} className="text-sm">What do you like about it? *</Label>
             <Textarea
               id={`comment-${item.id}`}
               value={item.comment}
@@ -84,6 +96,7 @@ const RepeatableField: React.FC<RepeatableFieldProps> = ({
               placeholder="Explain what elements you appreciate from this reel"
               className="mt-1"
               rows={3}
+              required={required}
             />
           </div>
         </div>

@@ -17,6 +17,7 @@ type CheckboxGroupProps = {
   otherOption?: boolean;
   otherValue?: string;
   onOtherChange?: (value: string) => void;
+  required?: boolean;
 };
 
 const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
@@ -26,7 +27,8 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
   onChange,
   otherOption = false,
   otherValue = '',
-  onOtherChange
+  onOtherChange,
+  required = false
 }) => {
   const handleCheckboxChange = (checked: boolean, id: string) => {
     if (checked) {
@@ -46,6 +48,7 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
               id={option.id}
               checked={selectedOptions.includes(option.id)}
               onCheckedChange={(checked) => handleCheckboxChange(checked as boolean, option.id)}
+              required={required && selectedOptions.length === 0}
             />
             <Label htmlFor={option.id} className="font-normal cursor-pointer">
               {option.label}
@@ -69,6 +72,7 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
                 onChange={(e) => onOtherChange && onOtherChange(e.target.value)}
                 placeholder="Please specify"
                 className="ml-2"
+                required={selectedOptions.includes('other')}
               />
             )}
           </div>

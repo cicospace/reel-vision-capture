@@ -13,13 +13,13 @@ const Index = () => {
         <div className="container max-w-4xl mx-auto px-4 relative z-10">
           <div className="flex items-center justify-center mb-3">
             <img 
-              src="/lovable-uploads/33cf0045-179b-43e8-8c55-1f9119b679ec.png" 
+              src="/lovable-uploads/a2a809e3-8770-41b2-bd3e-c4dc102d1aa9.png" 
               alt="Cicospace Logo" 
               className="h-16 sm:h-20"
             />
           </div>
           <h2 className="text-xl sm:text-2xl font-medium text-center max-w-2xl mx-auto">
-            Demo Reel Self Submission
+            Demo Reel Onboarding
           </h2>
           <p className="mt-4 text-center text-white/80 max-w-2xl mx-auto">
             Please fill out this form to submit all the creative direction and media we need to craft your personalized keynote demo reel. This will help us understand your vision and showcase your best moments.

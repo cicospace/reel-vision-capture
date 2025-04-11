@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { Film, Clipboard, User, Video, Clapperboard, Sparkles } from "lucide-react";
+import { Film, Clipboard, User, Video, Clapperboard, Sparkles, Info } from "lucide-react";
 import ProgressTracker from "./ProgressTracker";
 import CheckboxGroup from "./CheckboxGroup";
 import RadioGroupCustom from "./RadioGroupCustom";
@@ -32,7 +32,7 @@ type FormState = {
   scriptStructure: string;
   nonNegotiableClips: string;
   testimonials: string;
-  logoFiles: File[];
+  logoFolderLink: string;
   deckFiles: File[];
   credibilityMarkers: string[];
   otherCredibilityMarker: string;
@@ -54,7 +54,7 @@ const initialFormState: FormState = {
   scriptStructure: '',
   nonNegotiableClips: '',
   testimonials: '',
-  logoFiles: [],
+  logoFolderLink: '',
   deckFiles: [],
   credibilityMarkers: [],
   otherCredibilityMarker: '',
@@ -68,12 +68,10 @@ const toneOptions = [
   { id: 'inspirational', label: 'Inspirational' },
   { id: 'energetic', label: 'Energetic' },
   { id: 'authoritative', label: 'Authoritative' },
-  { id: 'relatable', label: 'Other' },
+  { id: 'other', label: 'Other' },
 ];
 
 const durationOptions = [
-  { id: 'under60', label: 'Under 60 seconds' },
-  { id: '1-2min', label: '1–2 minutes' },
   { id: '2-3min', label: '2–3 minutes' },
   { id: '3-4min', label: '3–4 minutes (recommended)' },
 ];
@@ -100,6 +98,74 @@ const SubmissionForm: React.FC = () => {
   };
 
   const nextStep = () => {
+    // Basic validation for current step
+    let isValid = true;
+    let errorMessage = '';
+
+    switch (formState.step) {
+      case 1:
+        if (formState.tones.length === 0) {
+          isValid = false;
+          errorMessage = 'Please select at least one tone.';
+        } else if (formState.tones.includes('other') && !formState.otherTone) {
+          isValid = false;
+          errorMessage = 'Please specify the other tone.';
+        } else if (!formState.duration) {
+          isValid = false;
+          errorMessage = 'Please select a duration.';
+        } else if (formState.duration === 'other' && !formState.otherDuration) {
+          isValid = false;
+          errorMessage = 'Please specify the other duration.';
+        }
+        break;
+      case 2:
+        if (!formState.footageLink) {
+          isValid = false;
+          errorMessage = 'Please provide a link to your footage.';
+        } else if (formState.footageTypes.length === 0) {
+          isValid = false;
+          errorMessage = 'Please select at least one footage type.';
+        } else if (formState.footageTypes.includes('other') && !formState.otherFootageType) {
+          isValid = false;
+          errorMessage = 'Please specify the other footage type.';
+        }
+        break;
+      case 3:
+        if (!formState.scriptStructure) {
+          isValid = false;
+          errorMessage = 'Please provide a script structure.';
+        } else if (!formState.nonNegotiableClips) {
+          isValid = false;
+          errorMessage = 'Please provide non-negotiable clips.';
+        }
+        break;
+      case 4:
+        if (!formState.testimonials) {
+          isValid = false;
+          errorMessage = 'Please provide testimonials or enter N/A if not applicable.';
+        } else if (!formState.logoFolderLink) {
+          isValid = false;
+          errorMessage = 'Please provide a link to your logos or enter N/A if not applicable.';
+        } else if (formState.credibilityMarkers.length === 0) {
+          isValid = false;
+          errorMessage = 'Please select at least one credibility marker.';
+        } else if (formState.credibilityMarkers.includes('other') && !formState.otherCredibilityMarker) {
+          isValid = false;
+          errorMessage = 'Please specify the other credibility marker.';
+        } else if (!formState.speakerBio) {
+          isValid = false;
+          errorMessage = 'Please provide your speaker bio.';
+        }
+        break;
+    }
+
+    if (!isValid) {
+      toast.error("Required Field Missing", {
+        description: errorMessage,
+      });
+      return;
+    }
+
     if (formState.step < totalSteps) {
       updateForm('step', formState.step + 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -115,6 +181,14 @@ const SubmissionForm: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!formState.additionalInfo) {
+      toast.error("Required Field Missing", {
+        description: "Please provide additional information or enter N/A if not applicable.",
+      });
+      return;
+    }
+    
     // In a real app, we would send the data to a server here
     console.log('Form submitted:', formState);
     toast.success("Form submitted successfully!", {
@@ -134,32 +208,39 @@ const SubmissionForm: React.FC = () => {
               <Clipboard size={20} className="text-reel-accent" />
               Project Preferences
             </h2>
+            <div className="mt-2 mb-6 bg-gray-50 p-3 rounded-md flex items-start">
+              <Info size={16} className="text-gray-500 mt-0.5 mr-2 flex-shrink-0" />
+              <p className="text-sm text-gray-600">All fields are required. Enter "N/A" if a text field is not applicable to you.</p>
+            </div>
             <div className="space-y-6">
               <CheckboxGroup
-                label="Which tones best represent your brand?"
+                label="Which tones best represent your brand? *"
                 options={toneOptions}
                 selectedOptions={formState.tones}
                 onChange={(value) => updateForm('tones', value)}
-                otherOption={true}
+                otherOption={false}
                 otherValue={formState.otherTone}
                 onOtherChange={(value) => updateForm('otherTone', value)}
+                required={true}
               />
               
               <RadioGroupCustom
-                label="How long should the final demo reel be?"
+                label="How long should the final demo reel be? *"
                 options={durationOptions}
                 value={formState.duration}
                 onChange={(value) => updateForm('duration', value)}
                 otherOption={true}
                 otherValue={formState.otherDuration}
                 onOtherChange={(value) => updateForm('otherDuration', value)}
+                required={true}
               />
               
               <RepeatableField
-                label="Reels You Like (Add up to 3 examples)"
+                label="Reels You Like (Add up to 3 examples) *"
                 items={formState.reelExamples}
                 onChange={(items) => updateForm('reelExamples', items)}
                 maxItems={3}
+                required={true}
               />
             </div>
           </div>
@@ -172,25 +253,31 @@ const SubmissionForm: React.FC = () => {
               <Video size={20} className="text-reel-accent" />
               Footage Submission
             </h2>
+            <div className="mt-2 mb-6 bg-gray-50 p-3 rounded-md flex items-start">
+              <Info size={16} className="text-gray-500 mt-0.5 mr-2 flex-shrink-0" />
+              <p className="text-sm text-gray-600">All fields are required. Enter "N/A" if a text field is not applicable to you.</p>
+            </div>
             <div className="space-y-6">
               <div>
-                <Label className="input-label">Paste the Google Drive or Dropbox link with all your raw media</Label>
+                <Label className="input-label">Paste the Google Drive or Dropbox link with all your raw media *</Label>
                 <Input
                   value={formState.footageLink}
                   onChange={(e) => updateForm('footageLink', e.target.value)}
                   placeholder="https://drive.google.com/..."
                   className="text-input"
+                  required
                 />
               </div>
               
               <CheckboxGroup
-                label="Check everything included in your footage folder:"
+                label="Check everything included in your footage folder: *"
                 options={footageTypeOptions}
                 selectedOptions={formState.footageTypes}
                 onChange={(value) => updateForm('footageTypes', value)}
                 otherOption={true}
                 otherValue={formState.otherFootageType}
                 onOtherChange={(value) => updateForm('otherFootageType', value)}
+                required={true}
               />
             </div>
           </div>
@@ -203,24 +290,30 @@ const SubmissionForm: React.FC = () => {
               <Clapperboard size={20} className="text-reel-accent" />
               Creative Direction
             </h2>
+            <div className="mt-2 mb-6 bg-gray-50 p-3 rounded-md flex items-start">
+              <Info size={16} className="text-gray-500 mt-0.5 mr-2 flex-shrink-0" />
+              <p className="text-sm text-gray-600">All fields are required. Enter "N/A" if a text field is not applicable to you.</p>
+            </div>
             <div className="space-y-6">
               <div>
-                <Label className="input-label">Share any general script or flow you'd like the reel to follow</Label>
+                <Label className="input-label">Share any general script or flow you'd like the reel to follow *</Label>
                 <Textarea
                   value={formState.scriptStructure}
                   onChange={(e) => updateForm('scriptStructure', e.target.value)}
-                  placeholder="Describe your vision for the reel structure and flow..."
+                  placeholder="Describe your vision for the reel structure and flow, or enter N/A if not applicable..."
                   className="text-input h-32"
+                  required
                 />
               </div>
               
               <div>
-                <Label className="input-label">List the clips (with timestamps if possible) that MUST be included</Label>
+                <Label className="input-label">List the clips (with timestamps if possible) that MUST be included *</Label>
                 <Textarea
                   value={formState.nonNegotiableClips}
                   onChange={(e) => updateForm('nonNegotiableClips', e.target.value)}
-                  placeholder="e.g., 'Main_Stage_Talk.mp4' at 14:35 - audience standing ovation..."
+                  placeholder="e.g., 'Main_Stage_Talk.mp4' at 14:35 - audience standing ovation, or enter N/A if not applicable..."
                   className="text-input h-32"
+                  required
                 />
               </div>
             </div>
@@ -234,46 +327,57 @@ const SubmissionForm: React.FC = () => {
               <User size={20} className="text-reel-accent" />
               Credibility & Social Proof
             </h2>
+            <div className="mt-2 mb-6 bg-gray-50 p-3 rounded-md flex items-start">
+              <Info size={16} className="text-gray-500 mt-0.5 mr-2 flex-shrink-0" />
+              <p className="text-sm text-gray-600">All fields are required. Enter "N/A" if a text field is not applicable to you.</p>
+            </div>
             <div className="space-y-6">
               <div>
-                <Label className="input-label">Add any testimonials you'd like us to consider</Label>
+                <Label className="input-label">Add any testimonials you'd like us to consider *</Label>
                 <Textarea
                   value={formState.testimonials}
                   onChange={(e) => updateForm('testimonials', e.target.value)}
-                  placeholder="Add testimonials that validate your expertise..."
+                  placeholder="Add testimonials that validate your expertise, or enter N/A if not applicable..."
                   className="text-input h-24"
+                  required
                 />
               </div>
               
-              <FileUploadField
-                label="Upload logos you'd like us to feature on your logo wall (PNG preferred)"
-                accept="image/*"
-                multiple={true}
-                files={formState.logoFiles}
-                onChange={(files) => updateForm('logoFiles', files)}
-              />
+              <div>
+                <Label className="input-label">Paste the Google Drive or Dropbox link with all your logo files (PNG preferred) *</Label>
+                <Input
+                  value={formState.logoFolderLink}
+                  onChange={(e) => updateForm('logoFolderLink', e.target.value)}
+                  placeholder="https://drive.google.com/... or enter N/A if not applicable"
+                  className="text-input"
+                  required
+                />
+                <p className="text-sm text-gray-500 mt-1">Upload all logos you'd like us to feature on your logo wall to a drive folder and share the link.</p>
+              </div>
               
               <FileUploadField
-                label="Upload your keynote slide deck or key visuals of your framework (highly recommended)"
+                label="Upload your keynote slide deck or key visuals of your framework (highly recommended) *"
                 description="Share your presentation materials to help us visualize your content"
                 accept=".pdf,.ppt,.pptx,.key"
                 multiple={false}
                 files={formState.deckFiles}
                 onChange={(files) => updateForm('deckFiles', files)}
+                required={true}
               />
               
               <CheckboxGroup
-                label="Which credibility markers apply to you?"
+                label="Which credibility markers apply to you? *"
                 options={credibilityOptions}
                 selectedOptions={formState.credibilityMarkers}
                 onChange={(value) => updateForm('credibilityMarkers', value)}
                 otherOption={true}
                 otherValue={formState.otherCredibilityMarker}
                 onOtherChange={(value) => updateForm('otherCredibilityMarker', value)}
+                required={true}
               />
               
               <div>
-                <Label className="input-label">Your current speaker bio <span className="text-red-500">*</span></Label>
+                <Label className="input-label">Your current speaker bio *</Label>
                 <Textarea
                   value={formState.speakerBio}
                   onChange={(e) => updateForm('speakerBio', e.target.value)}
@@ -288,6 +392,7 @@ const SubmissionForm: React.FC = () => {
                   multiple={false}
                   files={formState.speakerBioFiles}
                   onChange={(files) => updateForm('speakerBioFiles', files)}
+                  required={false}
                 />
               </div>
             </div>
@@ -302,13 +407,18 @@ const SubmissionForm: React.FC = () => {
                 <Film size={20} className="text-reel-accent" />
                 Final Details
               </h2>
+              <div className="mt-2 mb-6 bg-gray-50 p-3 rounded-md flex items-start">
+                <Info size={16} className="text-gray-500 mt-0.5 mr-2 flex-shrink-0" />
+                <p className="text-sm text-gray-600">All fields are required. Enter "N/A" if a text field is not applicable to you.</p>
+              </div>
               <div>
-                <Label className="input-label">Anything else you'd like us to know?</Label>
+                <Label className="input-label">Anything else you'd like us to know? *</Label>
                 <Textarea
                   value={formState.additionalInfo}
                   onChange={(e) => updateForm('additionalInfo', e.target.value)}
-                  placeholder="Share any additional information that might help us create your perfect demo reel..."
+                  placeholder="Share any additional information that might help us create your perfect demo reel, or enter N/A if not applicable..."
                   className="text-input h-32"
+                  required
                 />
               </div>
             </div>

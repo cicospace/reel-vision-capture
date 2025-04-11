@@ -17,6 +17,7 @@ type RadioGroupCustomProps = {
   otherOption?: boolean;
   otherValue?: string;
   onOtherChange?: (value: string) => void;
+  required?: boolean;
 };
 
 const RadioGroupCustom: React.FC<RadioGroupCustomProps> = ({
@@ -26,7 +27,8 @@ const RadioGroupCustom: React.FC<RadioGroupCustomProps> = ({
   onChange,
   otherOption = false,
   otherValue = '',
-  onOtherChange
+  onOtherChange,
+  required = false
 }) => {
   return (
     <div className="space-y-4">
@@ -34,7 +36,7 @@ const RadioGroupCustom: React.FC<RadioGroupCustomProps> = ({
       <RadioGroup value={value} onValueChange={onChange} className="space-y-2">
         {options.map(option => (
           <div key={option.id} className="flex items-center space-x-2">
-            <RadioGroupItem value={option.id} id={option.id} />
+            <RadioGroupItem value={option.id} id={option.id} required={required && !value} />
             <Label htmlFor={option.id} className="font-normal cursor-pointer">
               {option.label}
             </Label>
@@ -53,6 +55,7 @@ const RadioGroupCustom: React.FC<RadioGroupCustomProps> = ({
                 onChange={(e) => onOtherChange && onOtherChange(e.target.value)}
                 placeholder="Please specify"
                 className="ml-2"
+                required={value === 'other'}
               />
             )}
           </div>

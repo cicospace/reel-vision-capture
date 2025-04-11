@@ -11,6 +11,7 @@ type FileUploadFieldProps = {
   accept?: string;
   multiple?: boolean;
   files: File[];
+  required?: boolean;
 };
 
 const FileUploadField: React.FC<FileUploadFieldProps> = ({
@@ -19,7 +20,8 @@ const FileUploadField: React.FC<FileUploadFieldProps> = ({
   onChange,
   accept = '',
   multiple = false,
-  files
+  files,
+  required = false
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -44,7 +46,7 @@ const FileUploadField: React.FC<FileUploadFieldProps> = ({
 
   return (
     <div className="space-y-3">
-      <Label className="input-label">{label}</Label>
+      {label && <Label className="input-label">{label}</Label>}
       {description && <p className="text-sm text-gray-500">{description}</p>}
       
       <div
@@ -85,7 +87,11 @@ const FileUploadField: React.FC<FileUploadFieldProps> = ({
           accept={accept}
           multiple={multiple}
           onChange={handleFileChange}
+          required={required && files.length === 0}
         />
+        {required && files.length === 0 && (
+          <p className="text-xs text-red-500 mt-2">This field is required</p>
+        )}
       </div>
       
       {files.length > 0 && (
