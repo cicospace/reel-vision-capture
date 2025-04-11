@@ -2,8 +2,15 @@
 import { Button } from "@/components/ui/button";
 import SubmissionForm from "@/components/SubmissionForm";
 import { Mail } from "lucide-react";
+import { useEffect } from "react";
+import { initializeEmailJS } from "@/utils/emailService";
 
 const Index = () => {
+  useEffect(() => {
+    // Initialize EmailJS when the component mounts
+    initializeEmailJS();
+  }, []);
+
   return (
     <div className="min-h-screen pb-10">
       <header className="bg-black text-white py-10 mb-8 relative overflow-hidden">

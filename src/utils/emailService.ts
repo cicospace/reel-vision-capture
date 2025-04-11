@@ -1,5 +1,6 @@
 
 import { toast } from "sonner";
+import emailjs from 'emailjs-com';
 
 type EmailData = {
   to: string;
@@ -7,31 +8,32 @@ type EmailData = {
   body: string;
 };
 
+// Initialize EmailJS with your User ID (should be done in a component that loads early)
+export const initializeEmailJS = () => {
+  // Replace with your actual EmailJS user ID
+  emailjs.init("YOUR_USER_ID_HERE");
+};
+
 export const sendEmail = async (data: EmailData): Promise<boolean> => {
-  // In a production environment, you would connect to a real email service
-  // For this implementation, we'll use EmailJS as it's client-side friendly
-  // You would need to replace the service_id, template_id, and user_id with your actual EmailJS credentials
-  
   try {
-    // For demo purposes, we'll simulate success but log to console
     console.log('Sending email to:', data.to);
     console.log('Subject:', data.subject);
     console.log('Body:', data.body);
     
-    // In a real implementation with EmailJS, you would use code like:
-    // await emailjs.send(
-    //   "service_id",
-    //   "template_id",
-    //   { 
-    //     to_email: data.to,
-    //     subject: data.subject,
-    //     message: data.body
-    //   },
-    //   "user_id"
-    // );
+    // Send the email using EmailJS
+    const templateParams = {
+      to_email: data.to,
+      subject: data.subject,
+      message: data.body
+    };
     
-    // For now, we'll simulate success with a 1-second delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // Replace with your actual service ID and template ID
+    await emailjs.send(
+      "service_id",  // Replace with your EmailJS service ID
+      "template_id", // Replace with your EmailJS template ID
+      templateParams
+    );
+    
     return true;
   } catch (error) {
     console.error('Error sending email:', error);
