@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { Film, Clipboard, User, Video, Clapperboard, Sparkles, Info, Mail } from "lucide-react";
+import { Film, Clipboard, User, Video, Clapperboard, Sparkles, Info, Mail, Globe, FileText, Phone } from "lucide-react";
 import ProgressTracker from "./ProgressTracker";
 import CheckboxGroup from "./CheckboxGroup";
 import RadioGroupCustom from "./RadioGroupCustom";
@@ -21,6 +21,12 @@ type ReelExample = {
 };
 
 type FormState = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  cellPhone: string;
+  website: string;
+  
   tones: string[];
   otherTone: string;
   duration: string;
@@ -38,11 +44,18 @@ type FormState = {
   otherCredibilityMarker: string;
   speakerBio: string;
   speakerBioFiles: File[];
+  brandingGuidelinesFiles: File[];
   additionalInfo: string;
   step: number;
 };
 
 const initialFormState: FormState = {
+  firstName: '',
+  lastName: '',
+  email: '',
+  cellPhone: '',
+  website: '',
+  
   tones: [],
   otherTone: '',
   duration: '',
@@ -60,6 +73,7 @@ const initialFormState: FormState = {
   otherCredibilityMarker: '',
   speakerBio: '',
   speakerBioFiles: [],
+  brandingGuidelinesFiles: [],
   additionalInfo: '',
   step: 1,
 };
@@ -92,7 +106,7 @@ const credibilityOptions = [
 const SubmissionForm: React.FC = () => {
   const [formState, setFormState] = useState<FormState>(initialFormState);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const totalSteps = 5;
+  const totalSteps = 6;
 
   const updateForm = (key: keyof FormState, value: any) => {
     setFormState(prev => ({ ...prev, [key]: value }));
@@ -104,6 +118,27 @@ const SubmissionForm: React.FC = () => {
 
     switch (formState.step) {
       case 1:
+        if (!formState.firstName) {
+          isValid = false;
+          errorMessage = 'Please enter your first name.';
+        } else if (!formState.lastName) {
+          isValid = false;
+          errorMessage = 'Please enter your last name.';
+        } else if (!formState.email) {
+          isValid = false;
+          errorMessage = 'Please enter your email address.';
+        } else if (!/\S+@\S+\.\S+/.test(formState.email)) {
+          isValid = false;
+          errorMessage = 'Please enter a valid email address.';
+        } else if (!formState.cellPhone) {
+          isValid = false;
+          errorMessage = 'Please enter your cell phone number.';
+        } else if (!formState.website) {
+          isValid = false;
+          errorMessage = 'Please enter your website or enter N/A if not applicable.';
+        }
+        break;
+      case 2:
         if (formState.tones.length === 0) {
           isValid = false;
           errorMessage = 'Please select at least one tone.';
@@ -118,7 +153,7 @@ const SubmissionForm: React.FC = () => {
           errorMessage = 'Please specify the other duration.';
         }
         break;
-      case 2:
+      case 3:
         if (!formState.footageLink) {
           isValid = false;
           errorMessage = 'Please provide a link to your footage.';
@@ -130,7 +165,7 @@ const SubmissionForm: React.FC = () => {
           errorMessage = 'Please specify the other footage type.';
         }
         break;
-      case 3:
+      case 4:
         if (!formState.scriptStructure) {
           isValid = false;
           errorMessage = 'Please provide a script structure.';
@@ -139,7 +174,7 @@ const SubmissionForm: React.FC = () => {
           errorMessage = 'Please provide non-negotiable clips.';
         }
         break;
-      case 4:
+      case 5:
         if (!formState.testimonials) {
           isValid = false;
           errorMessage = 'Please provide testimonials or enter N/A if not applicable.';
@@ -227,6 +262,81 @@ const SubmissionForm: React.FC = () => {
         return (
           <div className="form-section border border-gray-200">
             <h2 className="section-title">
+              <User size={20} className="text-reel-accent" />
+              Contact Information
+            </h2>
+            <div className="mt-2 mb-6 bg-gray-50 p-3 rounded-md flex items-start">
+              <Info size={16} className="text-gray-500 mt-0.5 mr-2 flex-shrink-0" />
+              <p className="text-sm text-gray-600">All fields are required. Enter "N/A" if a text field is not applicable to you.</p>
+            </div>
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label className="input-label">First Name *</Label>
+                  <Input
+                    value={formState.firstName}
+                    onChange={(e) => updateForm('firstName', e.target.value)}
+                    placeholder="Your first name"
+                    className="text-input"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label className="input-label">Last Name *</Label>
+                  <Input
+                    value={formState.lastName}
+                    onChange={(e) => updateForm('lastName', e.target.value)}
+                    placeholder="Your last name"
+                    className="text-input"
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label className="input-label">Email Address *</Label>
+                  <Input
+                    type="email"
+                    value={formState.email}
+                    onChange={(e) => updateForm('email', e.target.value)}
+                    placeholder="your.email@example.com"
+                    className="text-input"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label className="input-label">Cell Phone *</Label>
+                  <Input
+                    type="tel"
+                    value={formState.cellPhone}
+                    onChange={(e) => updateForm('cellPhone', e.target.value)}
+                    placeholder="(555) 123-4567"
+                    className="text-input"
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <Label className="input-label">Your Website *</Label>
+                <Input
+                  value={formState.website}
+                  onChange={(e) => updateForm('website', e.target.value)}
+                  placeholder="https://yourwebsite.com or N/A"
+                  className="text-input"
+                  required
+                />
+                <p className="text-sm text-gray-500 mt-1">Enter your website URL or N/A if you don't have one.</p>
+              </div>
+            </div>
+          </div>
+        );
+      
+      case 2:
+        return (
+          <div className="form-section border border-gray-200">
+            <h2 className="section-title">
               <Clipboard size={20} className="text-reel-accent" />
               Project Preferences
             </h2>
@@ -234,6 +344,7 @@ const SubmissionForm: React.FC = () => {
               <Info size={16} className="text-gray-500 mt-0.5 mr-2 flex-shrink-0" />
               <p className="text-sm text-gray-600">All fields are required. Enter "N/A" if a text field is not applicable to you.</p>
             </div>
+            
             <div className="space-y-6">
               <CheckboxGroup
                 label="Which tones best represent your brand? *"
@@ -268,7 +379,7 @@ const SubmissionForm: React.FC = () => {
           </div>
         );
       
-      case 2:
+      case 3:
         return (
           <div className="form-section border border-gray-200">
             <h2 className="section-title">
@@ -305,7 +416,7 @@ const SubmissionForm: React.FC = () => {
           </div>
         );
       
-      case 3:
+      case 4:
         return (
           <div className="form-section border border-gray-200">
             <h2 className="section-title">
@@ -342,7 +453,7 @@ const SubmissionForm: React.FC = () => {
           </div>
         );
       
-      case 4:
+      case 5:
         return (
           <div className="form-section border border-gray-200">
             <h2 className="section-title">
@@ -387,6 +498,16 @@ const SubmissionForm: React.FC = () => {
                 required={true}
               />
               
+              <FileUploadField
+                label="Upload any branding guidelines *"
+                description="Share your brand guidelines to ensure we maintain your brand consistency"
+                accept=".pdf,.doc,.docx,.jpg,.png"
+                multiple={true}
+                files={formState.brandingGuidelinesFiles}
+                onChange={(files) => updateForm('brandingGuidelinesFiles', files)}
+                required={false}
+              />
+              
               <CheckboxGroup
                 label="Which credibility markers apply to you? *"
                 options={credibilityOptions}
@@ -421,7 +542,7 @@ const SubmissionForm: React.FC = () => {
           </div>
         );
       
-      case 5:
+      case 6:
         return (
           <div className="space-y-6">
             <div className="form-section border border-gray-200">

@@ -50,8 +50,15 @@ export const sendEmail = async (data: EmailData): Promise<boolean> => {
 export const formatEmailBody = (formData: any): string => {
   let body = `Demo Reel Submission\n\n`;
   
+  // Contact Information
+  body += `== CONTACT INFORMATION ==\n`;
+  body += `Name: ${formData.firstName} ${formData.lastName}\n`;
+  body += `Email: ${formData.email}\n`;
+  body += `Cell Phone: ${formData.cellPhone}\n`;
+  body += `Website: ${formData.website}\n`;
+  
   // Project Preferences
-  body += `== PROJECT PREFERENCES ==\n`;
+  body += `\n== PROJECT PREFERENCES ==\n`;
   body += `Tones: ${formData.tones.join(', ')}\n`;
   if (formData.tones.includes('other')) {
     body += `Other tone: ${formData.otherTone}\n`;
@@ -89,6 +96,7 @@ export const formatEmailBody = (formData: any): string => {
     body += `Other credibility marker: ${formData.otherCredibilityMarker}\n`;
   }
   body += `Speaker Bio: ${formData.speakerBio}\n`;
+  body += `Branding Guidelines: ${formData.brandingGuidelinesFiles.length > 0 ? 'Uploaded' : 'None provided'}\n`;
   
   // Additional Info
   body += `\n== ADDITIONAL INFORMATION ==\n`;
