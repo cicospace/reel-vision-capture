@@ -1,6 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import SubmissionForm from "@/components/SubmissionForm";
+import { Mail } from "lucide-react";
 
 const Index = () => {
   return (
@@ -24,6 +25,10 @@ const Index = () => {
           <p className="mt-4 text-center text-white/80 max-w-2xl mx-auto">
             Please fill out this form to submit all the creative direction and media we need to craft your personalized keynote demo reel. This will help us understand your vision and showcase your best moments.
           </p>
+          <div className="mt-4 flex items-center justify-center gap-2 text-center text-white/80 text-sm">
+            <Mail size={14} className="text-reel-gold" />
+            <span>All submissions will be emailed to the Cicospace team.</span>
+          </div>
         </div>
       </header>
 

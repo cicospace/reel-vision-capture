@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,12 +6,13 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { Film, Clipboard, User, Video, Clapperboard, Sparkles, Info } from "lucide-react";
+import { Film, Clipboard, User, Video, Clapperboard, Sparkles, Info, Mail } from "lucide-react";
 import ProgressTracker from "./ProgressTracker";
 import CheckboxGroup from "./CheckboxGroup";
 import RadioGroupCustom from "./RadioGroupCustom";
 import RepeatableField from "./RepeatableField";
 import FileUploadField from "./FileUploadField";
+import { sendEmail, formatEmailBody } from "@/utils/emailService";
 
 type ReelExample = {
   id: string;
@@ -91,6 +91,7 @@ const credibilityOptions = [
 
 const SubmissionForm: React.FC = () => {
   const [formState, setFormState] = useState<FormState>(initialFormState);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const totalSteps = 5;
 
   const updateForm = (key: keyof FormState, value: any) => {
@@ -98,7 +99,6 @@ const SubmissionForm: React.FC = () => {
   };
 
   const nextStep = () => {
-    // Basic validation for current step
     let isValid = true;
     let errorMessage = '';
 
@@ -179,7 +179,7 @@ const SubmissionForm: React.FC = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formState.additionalInfo) {
@@ -189,14 +189,36 @@ const SubmissionForm: React.FC = () => {
       return;
     }
     
-    // In a real app, we would send the data to a server here
-    console.log('Form submitted:', formState);
-    toast.success("Form submitted successfully!", {
-      description: "We'll be in touch with you soon about your demo reel!",
-    });
+    setIsSubmitting(true);
     
-    // Reset form
-    setFormState(initialFormState);
+    try {
+      const emailBody = formatEmailBody(formState);
+      
+      const emailSent = await sendEmail({
+        to: "cico@cicospace.com",
+        subject: "New Demo Reel Submission",
+        body: emailBody,
+      });
+      
+      if (emailSent) {
+        toast.success("Form submitted successfully!", {
+          description: "We'll be in touch with you soon about your demo reel!",
+        });
+        
+        setFormState(initialFormState);
+      } else {
+        toast.error("Error submitting form", {
+          description: "There was an issue sending your submission. Please try again later.",
+        });
+      }
+    } catch (error) {
+      console.error('Submission error:', error);
+      toast.error("Error submitting form", {
+        description: "There was an issue sending your submission. Please try again later.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderStepContent = () => {
@@ -434,8 +456,16 @@ const SubmissionForm: React.FC = () => {
               <Button 
                 onClick={handleSubmit}
                 className="w-full bg-black hover:bg-gray-800 text-white"
+                disabled={isSubmitting}
               >
-                Submit Demo Reel Request
+                {isSubmitting ? (
+                  <>
+                    <span className="mr-2">Submitting...</span>
+                    <Mail className="h-4 w-4 animate-pulse" />
+                  </>
+                ) : (
+                  "Submit Demo Reel Request"
+                )}
               </Button>
             </Card>
           </div>
