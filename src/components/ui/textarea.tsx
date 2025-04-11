@@ -15,7 +15,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           className
         )}
         ref={ref}
-        style={{ color: 'black' }}
+        style={{ color: '#000000' }}
         {...props}
       />
     )

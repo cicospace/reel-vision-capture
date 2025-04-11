@@ -1,6 +1,5 @@
 
 import { toast } from "sonner";
-import emailjs from 'emailjs-com';
 
 type EmailData = {
   to: string;
@@ -8,10 +7,10 @@ type EmailData = {
   body: string;
 };
 
-// Initialize EmailJS with your User ID (should be done in a component that loads early)
+// This function is no longer needed with our alternative approach
 export const initializeEmailJS = () => {
-  // Replace with your actual EmailJS user ID
-  emailjs.init("YOUR_USER_ID_HERE");
+  // This is kept as a no-op to avoid breaking existing code
+  console.log("Using alternative email submission method");
 };
 
 export const sendEmail = async (data: EmailData): Promise<boolean> => {
@@ -20,19 +19,23 @@ export const sendEmail = async (data: EmailData): Promise<boolean> => {
     console.log('Subject:', data.subject);
     console.log('Body:', data.body);
     
-    // Send the email using EmailJS
-    const templateParams = {
-      to_email: data.to,
-      subject: data.subject,
-      message: data.body
-    };
+    // Alternative 1: Use a form submission service like Formspree
+    // This approach doesn't require API keys in your frontend code
+    const response = await fetch("https://formspree.io/f/YOUR_FORMSPREE_ID", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email: data.to,
+        subject: data.subject,
+        message: data.body
+      })
+    });
     
-    // Replace with your actual service ID and template ID
-    await emailjs.send(
-      "service_id",  // Replace with your EmailJS service ID
-      "template_id", // Replace with your EmailJS template ID
-      templateParams
-    );
+    if (!response.ok) {
+      throw new Error("Form submission failed");
+    }
     
     return true;
   } catch (error) {
