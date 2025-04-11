@@ -68,21 +68,20 @@ const toneOptions = [
   { id: 'inspirational', label: 'Inspirational' },
   { id: 'energetic', label: 'Energetic' },
   { id: 'authoritative', label: 'Authoritative' },
-  { id: 'relatable', label: 'Relatable' },
-  { id: 'thoughtProvoking', label: 'Thought-provoking' },
+  { id: 'relatable', label: 'Other' },
 ];
 
 const durationOptions = [
   { id: 'under60', label: 'Under 60 seconds' },
   { id: '1-2min', label: '1–2 minutes' },
   { id: '2-3min', label: '2–3 minutes' },
+  { id: '3-4min', label: '3–4 minutes (recommended)' },
 ];
 
 const footageTypeOptions = [
   { id: 'keynote', label: 'Keynote footage' },
   { id: 'media', label: 'Media clips (TV, podcasts, etc.)' },
   { id: 'documentary', label: 'Documentaries' },
-  { id: 'social', label: 'Social media videos' },
 ];
 
 const credibilityOptions = [
@@ -237,7 +236,7 @@ const SubmissionForm: React.FC = () => {
             </h2>
             <div className="space-y-6">
               <div>
-                <Label className="input-label">Paste any written testimonials or links to video testimonials</Label>
+                <Label className="input-label">Add any testimonials you'd like us to consider</Label>
                 <Textarea
                   value={formState.testimonials}
                   onChange={(e) => updateForm('testimonials', e.target.value)}
@@ -255,8 +254,8 @@ const SubmissionForm: React.FC = () => {
               />
               
               <FileUploadField
-                label="Upload your keynote slide deck or key visuals you want us to use"
-                description="Optional: Share your presentation materials"
+                label="Upload your keynote slide deck or key visuals of your framework (highly recommended)"
+                description="Share your presentation materials to help us visualize your content"
                 accept=".pdf,.ppt,.pptx,.key"
                 multiple={false}
                 files={formState.deckFiles}
@@ -274,16 +273,17 @@ const SubmissionForm: React.FC = () => {
               />
               
               <div>
-                <Label className="input-label">Upload or paste your most current speaker bio</Label>
+                <Label className="input-label">Your current speaker bio <span className="text-red-500">*</span></Label>
                 <Textarea
                   value={formState.speakerBio}
                   onChange={(e) => updateForm('speakerBio', e.target.value)}
                   placeholder="Paste your speaker bio here or upload a file below..."
                   className="text-input h-24 mb-3"
+                  required
                 />
                 <FileUploadField
                   label=""
-                  description="Optional: Upload your bio as a document"
+                  description="Optional: Upload your bio as a document instead of typing it above"
                   accept=".pdf,.doc,.docx,.txt"
                   multiple={false}
                   files={formState.speakerBioFiles}
