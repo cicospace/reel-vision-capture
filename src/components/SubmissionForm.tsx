@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { Film, Clipboard, User, Video, Clapperboard } from "lucide-react";
+import { Film, Clipboard, User, Video, Clapperboard, Sparkles } from "lucide-react";
 import ProgressTracker from "./ProgressTracker";
 import CheckboxGroup from "./CheckboxGroup";
 import RadioGroupCustom from "./RadioGroupCustom";
@@ -130,7 +130,7 @@ const SubmissionForm: React.FC = () => {
     switch (formState.step) {
       case 1:
         return (
-          <div className="form-section">
+          <div className="form-section border border-gray-200">
             <h2 className="section-title">
               <Clipboard size={20} className="text-reel-accent" />
               Project Preferences
@@ -168,7 +168,7 @@ const SubmissionForm: React.FC = () => {
       
       case 2:
         return (
-          <div className="form-section">
+          <div className="form-section border border-gray-200">
             <h2 className="section-title">
               <Video size={20} className="text-reel-accent" />
               Footage Submission
@@ -199,7 +199,7 @@ const SubmissionForm: React.FC = () => {
       
       case 3:
         return (
-          <div className="form-section">
+          <div className="form-section border border-gray-200">
             <h2 className="section-title">
               <Clapperboard size={20} className="text-reel-accent" />
               Creative Direction
@@ -230,7 +230,7 @@ const SubmissionForm: React.FC = () => {
       
       case 4:
         return (
-          <div className="form-section">
+          <div className="form-section border border-gray-200">
             <h2 className="section-title">
               <User size={20} className="text-reel-accent" />
               Credibility & Social Proof
@@ -297,7 +297,7 @@ const SubmissionForm: React.FC = () => {
       case 5:
         return (
           <div className="space-y-6">
-            <div className="form-section">
+            <div className="form-section border border-gray-200">
               <h2 className="section-title">
                 <Film size={20} className="text-reel-accent" />
                 Final Details
@@ -313,14 +313,17 @@ const SubmissionForm: React.FC = () => {
               </div>
             </div>
             
-            <Card className="p-6 border-reel-accent/20 bg-reel-accent/5">
-              <h3 className="font-semibold text-lg mb-4">Review Your Submission</h3>
-              <p className="text-sm text-gray-600 mb-4">
-                Please review all the information you've provided before submitting. Once submitted, our team will begin crafting your personalized demo reel based on your specifications.
+            <Card className="p-6 border-black/10 bg-gradient-to-b from-white to-gray-50">
+              <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
+                <Sparkles size={18} className="text-reel-accent" />
+                Review Your Submission
+              </h3>
+              <p className="text-sm text-gray-600 mb-6">
+                Once we receive all items, we'll review and confirm everything's good to go. If anything's missing, we'll reach out. Let's make something extraordinary.
               </p>
               <Button 
                 onClick={handleSubmit}
-                className="w-full bg-reel-accent hover:bg-reel-accent-hover text-white"
+                className="w-full bg-black hover:bg-gray-800 text-white"
               >
                 Submit Demo Reel Request
               </Button>
@@ -350,7 +353,7 @@ const SubmissionForm: React.FC = () => {
           )}
           
           {formState.step < totalSteps ? (
-            <Button type="button" onClick={nextStep} className="bg-reel-blue hover:bg-reel-blue-light">
+            <Button type="button" onClick={nextStep} className="bg-black hover:bg-gray-800">
               Continue
             </Button>
           ) : (

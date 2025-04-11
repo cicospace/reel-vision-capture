@@ -64,13 +64,13 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				reel: {
-					blue: '#1a253f',
-					'blue-light': '#2a3b66',
-					accent: '#f25c69',
-					'accent-hover': '#f03846',
-					gold: '#ffbf40',
-					dark: '#0f172a',
-					light: '#f8fafc'
+					blue: '#000000', // Changed to black
+					'blue-light': '#333333', // Changed to dark gray
+					accent: '#FFD700', // Changed to gold
+					'accent-hover': '#E6C200', // Changed to darker gold
+					gold: '#FFD700', // Changed to gold
+					dark: '#000000', // Changed to black
+					light: '#ffffff' // Changed to white
 				}
 			},
 			borderRadius: {
