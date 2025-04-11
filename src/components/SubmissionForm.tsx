@@ -351,7 +351,7 @@ const SubmissionForm: React.FC = () => {
                 options={toneOptions}
                 selectedOptions={formState.tones}
                 onChange={(value) => updateForm('tones', value)}
-                otherOption={false}
+                otherOption={true}
                 otherValue={formState.otherTone}
                 onOtherChange={(value) => updateForm('otherTone', value)}
                 required={true}
