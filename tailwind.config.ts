@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -63,14 +62,15 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
+				black: '#000000',
 				reel: {
-					blue: '#000000', // Changed to black
-					'blue-light': '#333333', // Changed to dark gray
-					accent: '#FFD700', // Changed to gold
-					'accent-hover': '#E6C200', // Changed to darker gold
-					gold: '#FFD700', // Changed to gold
-					dark: '#000000', // Changed to black
-					light: '#ffffff' // Changed to white
+					blue: '#000000',
+					'blue-light': '#333333',
+					accent: '#FFD700',
+					'accent-hover': '#E6C200',
+					gold: '#FFD700',
+					dark: '#000000',
+					light: '#ffffff'
 				}
 			},
 			borderRadius: {
