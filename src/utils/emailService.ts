@@ -1,4 +1,3 @@
-
 import { toast } from "sonner";
 
 type EmailData = {
@@ -13,14 +12,55 @@ export const initializeEmailJS = () => {
   console.log("Using alternative email submission method");
 };
 
+// Add a new type for form data persistence
+export type StoredFormData = {
+  timestamp: string;
+  data: any;
+  status: 'draft' | 'failed';
+};
+
+// Function to save form data to localStorage
+export const saveFormToStorage = (formData: any) => {
+  try {
+    const storedData: StoredFormData = {
+      timestamp: new Date().toISOString(),
+      data: formData,
+      status: 'draft'
+    };
+    localStorage.setItem('demoReelFormData', JSON.stringify(storedData));
+    console.log('Form data saved to localStorage');
+  } catch (error) {
+    console.error('Error saving form data:', error);
+  }
+};
+
+// Function to load form data from localStorage
+export const loadFormFromStorage = (): StoredFormData | null => {
+  try {
+    const savedData = localStorage.getItem('demoReelFormData');
+    return savedData ? JSON.parse(savedData) : null;
+  } catch (error) {
+    console.error('Error loading form data:', error);
+    return null;
+  }
+};
+
+// Function to clear form data from localStorage
+export const clearStoredFormData = () => {
+  try {
+    localStorage.removeItem('demoReelFormData');
+    console.log('Form data cleared from localStorage');
+  } catch (error) {
+    console.error('Error clearing form data:', error);
+  }
+};
+
 export const sendEmail = async (data: EmailData): Promise<boolean> => {
   try {
     console.log('Sending email to:', data.to);
     console.log('Subject:', data.subject);
     console.log('Body:', data.body);
     
-    // Using Formspree - a built-in email notification service
-    // This approach doesn't require API keys in your frontend code
     const response = await fetch("https://formspree.io/f/mldjazoy", {
       method: "POST",
       headers: {
@@ -38,9 +78,19 @@ export const sendEmail = async (data: EmailData): Promise<boolean> => {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       console.error('Form submission error:', errorData);
+      
+      // Mark the stored form data as failed
+      const storedData = loadFormFromStorage();
+      if (storedData) {
+        storedData.status = 'failed';
+        localStorage.setItem('demoReelFormData', JSON.stringify(storedData));
+      }
+      
       throw new Error(errorData.message || "Form submission failed");
     }
     
+    // Clear stored form data on successful submission
+    clearStoredFormData();
     return true;
   } catch (error) {
     console.error('Error sending email:', error);

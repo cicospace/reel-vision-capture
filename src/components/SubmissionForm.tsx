@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -268,17 +268,18 @@ const SubmissionForm: React.FC = () => {
           description: "We'll be in touch with you soon about your demo reel!",
         });
         
+        clearStoredFormData();
         setFormState(initialFormState);
         updateForm('step', 1);
       } else {
         toast.error("Error submitting form", {
-          description: "There was an issue sending your submission. Please try again later.",
+          description: "Your data has been saved locally. You can try submitting again later.",
         });
       }
     } catch (error) {
       console.error('Submission error:', error);
       toast.error("Error submitting form", {
-        description: "There was an issue sending your submission. Please try again later.",
+        description: "Your data has been saved locally. You can try submitting again later.",
       });
     } finally {
       setIsSubmitting(false);
@@ -636,6 +637,29 @@ const SubmissionForm: React.FC = () => {
         return null;
     }
   };
+
+  React.useEffect(() => {
+    const savedData = loadFormFromStorage();
+    if (savedData) {
+      toast.info("Found saved form data", {
+        description: "Your previous form data has been restored.",
+        action: {
+          label: "Clear",
+          onClick: () => {
+            clearStoredFormData();
+            setFormState(initialFormState);
+          }
+        }
+      });
+      setFormState(prev => ({ ...prev, ...savedData.data }));
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (JSON.stringify(formState) !== JSON.stringify(initialFormState)) {
+      saveFormToStorage(formState);
+    }
+  }, [formState]);
 
   return (
     <div>
