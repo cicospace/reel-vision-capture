@@ -113,31 +113,44 @@ const SubmissionForm: React.FC = () => {
     setFormState(prev => ({ ...prev, [key]: value }));
   };
 
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+  
+  const validatePhoneNumber = (phone: string): boolean => {
+    const digits = phone.replace(/\D/g, '');
+    return digits.length >= 10;
+  };
+
   const nextStep = () => {
     let isValid = true;
     let errorMessage = '';
 
     switch (formState.step) {
       case 1:
-        if (!formState.firstName) {
+        if (!formState.firstName.trim()) {
           isValid = false;
           errorMessage = 'Please enter your first name.';
-        } else if (!formState.lastName) {
+        } else if (!formState.lastName.trim()) {
           isValid = false;
           errorMessage = 'Please enter your last name.';
-        } else if (!formState.email) {
+        } else if (!formState.email.trim()) {
           isValid = false;
           errorMessage = 'Please enter your email address.';
-        } else if (!/\S+@\S+\.\S+/.test(formState.email)) {
+        } else if (!validateEmail(formState.email)) {
           isValid = false;
           errorMessage = 'Please enter a valid email address.';
-        } else if (!formState.cellPhone) {
+        } else if (!formState.cellPhone.trim()) {
           isValid = false;
           errorMessage = 'Please enter your cell phone number.';
-        } else if (!formState.website) {
+        } else if (!validatePhoneNumber(formState.cellPhone)) {
+          isValid = false;
+          errorMessage = 'Please enter a valid phone number (at least 10 digits).';
+        } else if (!formState.website.trim()) {
           isValid = false;
           errorMessage = 'Please enter your website or enter N/A if not applicable.';
-        } else if (!formState.problemSolved) {
+        } else if (!formState.problemSolved.trim()) {
           isValid = false;
           errorMessage = 'Please describe what problem you solve.';
         }
@@ -146,52 +159,63 @@ const SubmissionForm: React.FC = () => {
         if (formState.tones.length === 0) {
           isValid = false;
           errorMessage = 'Please select at least one tone.';
-        } else if (formState.tones.includes('other') && !formState.otherTone) {
+        } else if (formState.tones.includes('other') && !formState.otherTone.trim()) {
           isValid = false;
           errorMessage = 'Please specify the other tone.';
         } else if (!formState.duration) {
           isValid = false;
           errorMessage = 'Please select a duration.';
-        } else if (formState.duration === 'other' && !formState.otherDuration) {
+        } else if (formState.duration === 'other' && !formState.otherDuration.trim()) {
           isValid = false;
           errorMessage = 'Please specify the other duration.';
+        } else if (formState.reelExamples.length === 0) {
+          isValid = false;
+          errorMessage = 'Please add at least one reel example.';
+        } else {
+          for (const example of formState.reelExamples) {
+            if (!example.link.trim() || !example.comment.trim()) {
+              isValid = false;
+              errorMessage = 'Please complete all fields for each reel example.';
+              break;
+            }
+          }
         }
         break;
       case 3:
-        if (!formState.footageLink) {
+        if (!formState.footageLink.trim()) {
           isValid = false;
           errorMessage = 'Please provide a link to your footage.';
         } else if (formState.footageTypes.length === 0) {
           isValid = false;
           errorMessage = 'Please select at least one footage type.';
-        } else if (formState.footageTypes.includes('other') && !formState.otherFootageType) {
+        } else if (formState.footageTypes.includes('other') && !formState.otherFootageType.trim()) {
           isValid = false;
           errorMessage = 'Please specify the other footage type.';
         }
         break;
       case 4:
-        if (!formState.scriptStructure) {
+        if (!formState.scriptStructure.trim()) {
           isValid = false;
           errorMessage = 'Please provide a script structure.';
-        } else if (!formState.nonNegotiableClips) {
+        } else if (!formState.nonNegotiableClips.trim()) {
           isValid = false;
           errorMessage = 'Please provide non-negotiable clips.';
         }
         break;
       case 5:
-        if (!formState.testimonials) {
+        if (!formState.testimonials.trim()) {
           isValid = false;
           errorMessage = 'Please provide testimonials or enter N/A if not applicable.';
-        } else if (!formState.logoFolderLink) {
+        } else if (!formState.logoFolderLink.trim()) {
           isValid = false;
           errorMessage = 'Please provide a link to your logos or enter N/A if not applicable.';
         } else if (formState.credibilityMarkers.length === 0) {
           isValid = false;
           errorMessage = 'Please select at least one credibility marker.';
-        } else if (formState.credibilityMarkers.includes('other') && !formState.otherCredibilityMarker) {
+        } else if (formState.credibilityMarkers.includes('other') && !formState.otherCredibilityMarker.trim()) {
           isValid = false;
           errorMessage = 'Please specify the other credibility marker.';
-        } else if (!formState.speakerBio) {
+        } else if (!formState.speakerBio.trim()) {
           isValid = false;
           errorMessage = 'Please provide your speaker bio.';
         }
@@ -221,7 +245,7 @@ const SubmissionForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formState.additionalInfo) {
+    if (!formState.additionalInfo.trim()) {
       toast.error("Required Field Missing", {
         description: "Please provide additional information or enter N/A if not applicable.",
       });
@@ -235,7 +259,7 @@ const SubmissionForm: React.FC = () => {
       
       const emailSent = await sendEmail({
         to: "cico@cicospace.com",
-        subject: "New Demo Reel Submission",
+        subject: `New Demo Reel Submission - ${formState.firstName} ${formState.lastName}`,
         body: emailBody,
       });
       
@@ -245,6 +269,7 @@ const SubmissionForm: React.FC = () => {
         });
         
         setFormState(initialFormState);
+        updateForm('step', 1);
       } else {
         toast.error("Error submitting form", {
           description: "There was an issue sending your submission. Please try again later.",

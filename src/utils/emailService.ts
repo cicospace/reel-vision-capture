@@ -36,7 +36,9 @@ export const sendEmail = async (data: EmailData): Promise<boolean> => {
     });
     
     if (!response.ok) {
-      throw new Error("Form submission failed");
+      const errorData = await response.json().catch(() => ({}));
+      console.error('Form submission error:', errorData);
+      throw new Error(errorData.message || "Form submission failed");
     }
     
     return true;
@@ -71,9 +73,13 @@ export const formatEmailBody = (formData: any): string => {
   
   // Reel Examples
   body += `\nReel Examples:\n`;
-  formData.reelExamples.forEach((example: any, index: number) => {
-    body += `Example ${index + 1}: ${example.link} - ${example.comment}\n`;
-  });
+  if (formData.reelExamples.length === 0) {
+    body += `No examples provided\n`;
+  } else {
+    formData.reelExamples.forEach((example: any, index: number) => {
+      body += `Example ${index + 1}: ${example.link} - ${example.comment}\n`;
+    });
+  }
   
   // Footage Submission
   body += `\n== FOOTAGE SUBMISSION ==\n`;
