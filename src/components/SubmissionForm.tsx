@@ -12,7 +12,7 @@ import CheckboxGroup from "./CheckboxGroup";
 import RadioGroupCustom from "./RadioGroupCustom";
 import RepeatableField from "./RepeatableField";
 import FileUploadField from "./FileUploadField";
-import { sendEmail, formatEmailBody } from "@/utils/emailService";
+import { sendEmail, formatEmailBody, loadFormFromStorage, saveFormToStorage, clearStoredFormData } from "@/utils/emailService";
 
 type ReelExample = {
   id: string;
