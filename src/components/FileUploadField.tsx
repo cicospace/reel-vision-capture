@@ -39,9 +39,9 @@ const FileUploadField: React.FC<FileUploadFieldProps> = ({
 
   const getFileIcon = (file: File) => {
     if (file.type.startsWith('image/')) {
-      return <Image size={16} />;
+      return <Image size={16} className="text-white" />;
     }
-    return <FileText size={16} />;
+    return <FileText size={16} className="text-white" />;
   };
 
   return (
@@ -75,7 +75,7 @@ const FileUploadField: React.FC<FileUploadFieldProps> = ({
         <Button
           type="button"
           variant="outline"
-          className="bg-background text-foreground"
+          className="bg-background text-white"
           onClick={() => fileInputRef.current?.click()}
         >
           Browse Files
@@ -102,8 +102,8 @@ const FileUploadField: React.FC<FileUploadFieldProps> = ({
               <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-md">
                 <div className="flex items-center space-x-2">
                   {getFileIcon(file)}
-                  <span className="text-sm text-foreground truncate max-w-[200px]">{file.name}</span>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-sm text-white truncate max-w-[200px]">{file.name}</span>
+                  <span className="text-xs text-gray-400">
                     {(file.size / 1024 / 1024).toFixed(2)} MB
                   </span>
                 </div>

@@ -54,7 +54,7 @@ const RadioGroupCustom: React.FC<RadioGroupCustomProps> = ({
                 value={otherValue}
                 onChange={(e) => onOtherChange && onOtherChange(e.target.value)}
                 placeholder="Please specify"
-                className="ml-2 text-foreground"
+                className="ml-2 text-white"
                 required={value === 'other'}
               />
             )}

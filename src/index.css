@@ -99,7 +99,14 @@
   
   /* Force text color for all form inputs */
   input, textarea, select {
-    @apply text-foreground;
+    @apply text-white;
+    color: white !important;
+  }
+  
+  /* Make placeholder text visible */
+  ::placeholder {
+    color: #a0a0a0 !important;
+    opacity: 1 !important;
   }
 }
 
@@ -117,7 +124,7 @@
   }
   
   .text-input {
-    @apply w-full border border-input rounded-md px-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-accent;
+    @apply w-full border border-input rounded-md px-3 py-2 bg-background text-white focus:outline-none focus:ring-2 focus:ring-accent;
   }
   
   .progress-step {

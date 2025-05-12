@@ -82,7 +82,7 @@ const RepeatableField: React.FC<RepeatableFieldProps> = ({
               value={item.link}
               onChange={(e) => updateItem(item.id, 'link', e.target.value)}
               placeholder="Paste demo reel URL here"
-              className="mt-1 text-input text-foreground"
+              className="mt-1 text-input text-white"
               required={required}
             />
           </div>
@@ -94,7 +94,7 @@ const RepeatableField: React.FC<RepeatableFieldProps> = ({
               value={item.comment}
               onChange={(e) => updateItem(item.id, 'comment', e.target.value)}
               placeholder="Explain what elements you appreciate from this reel"
-              className="mt-1 text-foreground"
+              className="mt-1 text-white"
               rows={3}
               required={required}
             />

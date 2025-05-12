@@ -10,7 +10,7 @@ const FormNavigation: React.FC = () => {
   return (
     <div className="flex justify-between mt-6">
       {formState.step > 1 ? (
-        <Button type="button" variant="outline" onClick={prevStep}>
+        <Button type="button" variant="outline" onClick={prevStep} className="text-white">
           Previous
         </Button>
       ) : (
@@ -18,7 +18,7 @@ const FormNavigation: React.FC = () => {
       )}
       
       {formState.step < totalSteps ? (
-        <Button type="button" onClick={nextStep} className="bg-black hover:bg-gray-800">
+        <Button type="button" onClick={nextStep} className="bg-black hover:bg-gray-800 text-white">
           Continue
         </Button>
       ) : (
