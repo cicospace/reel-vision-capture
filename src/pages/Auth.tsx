@@ -62,24 +62,39 @@ const Auth = () => {
             <p className="text-center text-muted-foreground mb-4">
               Enter the secure access code to continue
             </p>
-            <div className="flex justify-center">
-              <InputOTP 
-                maxLength={20} 
-                value={accessCode} 
-                onChange={setAccessCode}
-                render={({ slots }) => (
+            <div className="flex justify-center mb-4">
+              <div className="max-w-[320px] overflow-hidden">
+                <InputOTP
+                  maxLength={20}
+                  value={accessCode}
+                  onChange={setAccessCode}
+                  pattern="^[A-Za-z0-9!@#$%^&*()_+-=[\]{}|;:,.<>/?]*$"
+                  inputMode="text"
+                >
                   <InputOTPGroup>
-                    {slots.map((slot, index) => (
-                      <InputOTPSlot 
-                        key={index} 
-                        {...slot} 
-                        index={index} 
-                        className="border-gray-700 bg-secondary text-foreground focus:border-accent"
-                      />
-                    ))}
+                    <InputOTPSlot index={0} />
+                    <InputOTPSlot index={1} />
+                    <InputOTPSlot index={2} />
+                    <InputOTPSlot index={3} />
+                    <InputOTPSlot index={4} />
+                    <InputOTPSlot index={5} />
+                    <InputOTPSlot index={6} />
+                    <InputOTPSlot index={7} />
+                    <InputOTPSlot index={8} />
+                    <InputOTPSlot index={9} />
+                    <InputOTPSlot index={10} />
+                    <InputOTPSlot index={11} />
+                    <InputOTPSlot index={12} />
+                    <InputOTPSlot index={13} />
+                    <InputOTPSlot index={14} />
+                    <InputOTPSlot index={15} />
+                    <InputOTPSlot index={16} />
+                    <InputOTPSlot index={17} />
+                    <InputOTPSlot index={18} />
+                    <InputOTPSlot index={19} />
                   </InputOTPGroup>
-                )}
-              />
+                </InputOTP>
+              </div>
             </div>
           </div>
           
