@@ -12,7 +12,14 @@ import CheckboxGroup from "./CheckboxGroup";
 import RadioGroupCustom from "./RadioGroupCustom";
 import RepeatableField from "./RepeatableField";
 import FileUploadField from "./FileUploadField";
-import { sendEmail, formatEmailBody, loadFormFromStorage, saveFormToStorage, clearStoredFormData } from "@/utils/emailService";
+import { 
+  sendEmail, 
+  formatEmailBody, 
+  loadFormFromStorage, 
+  saveFormToStorage, 
+  clearStoredFormData,
+  saveFormToSupabase
+} from "@/utils/emailService";
 
 type ReelExample = {
   id: string;
@@ -255,6 +262,14 @@ const SubmissionForm: React.FC = () => {
     setIsSubmitting(true);
     
     try {
+      // First save to Supabase
+      const { success, submissionId } = await saveFormToSupabase(formState);
+      
+      if (!success) {
+        throw new Error("Failed to save submission to database");
+      }
+      
+      // Then send email notification
       const emailBody = formatEmailBody(formState);
       
       const emailSent = await sendEmail({
@@ -272,8 +287,8 @@ const SubmissionForm: React.FC = () => {
         setFormState(initialFormState);
         updateForm('step', 1);
       } else {
-        toast.error("Error submitting form", {
-          description: "Your data has been saved locally. You can try submitting again later.",
+        toast.error("Error sending email notification", {
+          description: "Your submission was saved but we couldn't send the notification email. Our team will still review your submission.",
         });
       }
     } catch (error) {

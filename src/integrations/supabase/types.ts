@@ -9,7 +9,186 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      reel_examples: {
+        Row: {
+          comment: string
+          id: string
+          link: string
+          submission_id: string
+        }
+        Insert: {
+          comment: string
+          id?: string
+          link: string
+          submission_id: string
+        }
+        Update: {
+          comment?: string
+          id?: string
+          link?: string
+          submission_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reel_examples_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      submission_files: {
+        Row: {
+          created_at: string
+          file_name: string
+          file_path: string
+          file_type: string
+          id: string
+          submission_id: string
+        }
+        Insert: {
+          created_at?: string
+          file_name: string
+          file_path: string
+          file_type: string
+          id?: string
+          submission_id: string
+        }
+        Update: {
+          created_at?: string
+          file_name?: string
+          file_path?: string
+          file_type?: string
+          id?: string
+          submission_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "submission_files_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      submission_notes: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          note: string
+          submission_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          note: string
+          submission_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          note?: string
+          submission_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "submission_notes_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      submissions: {
+        Row: {
+          additional_info: string
+          cell_phone: string
+          created_at: string
+          credibility_markers: string[]
+          duration: string
+          email: string
+          first_name: string
+          footage_link: string
+          footage_types: string[]
+          id: string
+          last_name: string
+          logo_folder_link: string
+          non_negotiable_clips: string
+          other_credibility_marker: string | null
+          other_duration: string | null
+          other_footage_type: string | null
+          other_tone: string | null
+          problem_solved: string
+          script_structure: string
+          speaker_bio: string
+          status: string
+          testimonials: string
+          tone: string[]
+          updated_at: string
+          website: string
+        }
+        Insert: {
+          additional_info: string
+          cell_phone: string
+          created_at?: string
+          credibility_markers: string[]
+          duration: string
+          email: string
+          first_name: string
+          footage_link: string
+          footage_types: string[]
+          id?: string
+          last_name: string
+          logo_folder_link: string
+          non_negotiable_clips: string
+          other_credibility_marker?: string | null
+          other_duration?: string | null
+          other_footage_type?: string | null
+          other_tone?: string | null
+          problem_solved: string
+          script_structure: string
+          speaker_bio: string
+          status?: string
+          testimonials: string
+          tone: string[]
+          updated_at?: string
+          website: string
+        }
+        Update: {
+          additional_info?: string
+          cell_phone?: string
+          created_at?: string
+          credibility_markers?: string[]
+          duration?: string
+          email?: string
+          first_name?: string
+          footage_link?: string
+          footage_types?: string[]
+          id?: string
+          last_name?: string
+          logo_folder_link?: string
+          non_negotiable_clips?: string
+          other_credibility_marker?: string | null
+          other_duration?: string | null
+          other_footage_type?: string | null
+          other_tone?: string | null
+          problem_solved?: string
+          script_structure?: string
+          speaker_bio?: string
+          status?: string
+          testimonials?: string
+          tone?: string[]
+          updated_at?: string
+          website?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

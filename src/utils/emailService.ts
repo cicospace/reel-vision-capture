@@ -1,4 +1,6 @@
+
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 type EmailData = {
   to: string;
@@ -52,6 +54,69 @@ export const clearStoredFormData = () => {
     console.log('Form data cleared from localStorage');
   } catch (error) {
     console.error('Error clearing form data:', error);
+  }
+};
+
+// Function to save form data to Supabase
+export const saveFormToSupabase = async (formData: any): Promise<{ success: boolean, submissionId?: string }> => {
+  try {
+    // First, insert the main submission
+    const { data: submissionData, error: submissionError } = await supabase
+      .from('submissions')
+      .insert([
+        {
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          email: formData.email,
+          cell_phone: formData.cellPhone,
+          website: formData.website,
+          problem_solved: formData.problemSolved,
+          tone: formData.tones,
+          other_tone: formData.otherTone,
+          duration: formData.duration,
+          other_duration: formData.otherDuration,
+          footage_link: formData.footageLink,
+          footage_types: formData.footageTypes,
+          other_footage_type: formData.otherFootageType,
+          script_structure: formData.scriptStructure,
+          non_negotiable_clips: formData.nonNegotiableClips,
+          testimonials: formData.testimonials,
+          logo_folder_link: formData.logoFolderLink,
+          credibility_markers: formData.credibilityMarkers,
+          other_credibility_marker: formData.otherCredibilityMarker,
+          speaker_bio: formData.speakerBio,
+          additional_info: formData.additionalInfo,
+          status: 'new'
+        }
+      ])
+      .select();
+    
+    if (submissionError) throw submissionError;
+    
+    const submissionId = submissionData[0].id;
+    
+    // Then, insert reel examples
+    if (formData.reelExamples.length > 0) {
+      const reelExamplesToInsert = formData.reelExamples.map((example: any) => ({
+        submission_id: submissionId,
+        link: example.link,
+        comment: example.comment
+      }));
+      
+      const { error: reelExamplesError } = await supabase
+        .from('reel_examples')
+        .insert(reelExamplesToInsert);
+      
+      if (reelExamplesError) throw reelExamplesError;
+    }
+    
+    // Handle file uploads separately if needed
+    // This would involve uploading to storage and then saving metadata
+    
+    return { success: true, submissionId };
+  } catch (error) {
+    console.error('Error saving to Supabase:', error);
+    return { success: false };
   }
 };
 
