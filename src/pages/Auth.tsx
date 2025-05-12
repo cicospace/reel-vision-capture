@@ -7,9 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { KeyRound } from "lucide-react";
-
-// The secure access code - in a real application, this would be stored securely
-const SECURE_ACCESS_CODE = "KJ7p#xF2@qT9!LzN5vR8";
+import { validateAccessCode, ADMIN_EMAIL, setAuthenticatedState } from "@/utils/authUtils";
 
 const Auth = () => {
   const [accessCode, setAccessCode] = useState("");
@@ -21,28 +19,36 @@ const Auth = () => {
     setLoading(true);
     
     try {
-      // Call the edge function to validate the code and get a token
-      const response = await fetch('https://hxcceigrkxcaxsiikuvs.supabase.co/functions/v1/validate-access-code', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4Y2NlaWdya3hjYXhzaWlrdXZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcwNjcxNzcsImV4cCI6MjA2MjY0MzE3N30.UBLIXXjHIoOMS0p6-Wyd0wvAAlNKFaAt-vMuiuVdm3Y`
-        },
-        body: JSON.stringify({ accessCode })
-      });
-      
-      const responseData = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(responseData.error || "Invalid access code");
+      // First, validate the access code on the client side
+      if (!validateAccessCode(accessCode)) {
+        throw new Error("Invalid access code");
       }
       
-      // Use the token to sign in with a custom token
-      const { data, error } = await supabase.auth.signInWithToken({
-        token: responseData.token
+      // Create password using the access code
+      const password = `${accessCode}_supabase`;
+      
+      // Try to sign in first
+      let { data, error } = await supabase.auth.signInWithPassword({
+        email: ADMIN_EMAIL,
+        password: password,
       });
       
-      if (error) throw error;
+      // If the user doesn't exist yet, sign them up
+      if (error && error.message.includes("Invalid login credentials")) {
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          email: ADMIN_EMAIL,
+          password: password,
+        });
+        
+        if (signUpError) throw signUpError;
+        
+        data = signUpData;
+      } else if (error) {
+        throw error;
+      }
+      
+      // Store authentication state in localStorage
+      setAuthenticatedState();
       
       toast.success("Access granted");
       navigate("/admin");

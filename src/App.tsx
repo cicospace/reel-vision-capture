@@ -10,7 +10,7 @@ import Admin from "./pages/Admin";
 import Auth from "./pages/Auth";
 import SubmissionDetail from "./pages/SubmissionDetail";
 import NotFound from "./pages/NotFound";
-import AuthWrapper from "./components/AuthWrapper";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -28,9 +28,9 @@ const App = () => {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/admin" element={<AuthWrapper><Admin /></AuthWrapper>} />
+            <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
             <Route path="/auth" element={<Auth />} />
-            <Route path="/submission/:id" element={<AuthWrapper><SubmissionDetail /></AuthWrapper>} />
+            <Route path="/submission/:id" element={<ProtectedRoute><SubmissionDetail /></ProtectedRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
