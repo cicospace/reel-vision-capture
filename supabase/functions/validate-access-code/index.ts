@@ -42,8 +42,20 @@ serve(async (req) => {
       }
     );
     
-    // Generate a custom token for authentication
-    const { data, error } = await supabaseAdmin.auth.admin.generateLink({
+    // Create a custom token for the admin@cicospace.com user
+    // This approach uses createUser if the user doesn't exist yet, or just returns the user if they do
+    const { data: userData, error: userError } = await supabaseAdmin.auth.admin.createUser({
+      email: 'admin@cicospace.com',
+      email_confirm: true,
+      user_metadata: { role: 'admin' },
+    });
+    
+    if (userError && userError.message !== "User already registered") {
+      throw userError;
+    }
+    
+    // Generate a JWT token for the user
+    const { data: { session }, error } = await supabaseAdmin.auth.admin.generateLink({
       type: 'magiclink',
       email: 'admin@cicospace.com',
     });
@@ -55,7 +67,7 @@ serve(async (req) => {
     // Return the token
     return new Response(
       JSON.stringify({ 
-        token: data.properties.token 
+        token: session.access_token 
       }),
       { 
         status: 200, 

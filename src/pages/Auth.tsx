@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -36,8 +37,8 @@ const Auth = () => {
         throw new Error(responseData.error || "Invalid access code");
       }
       
-      // Use the custom token to sign in
-      const { data, error } = await supabase.auth.signInWithCustomToken({
+      // Use the token to sign in with a custom token
+      const { data, error } = await supabase.auth.signInWithToken({
         token: responseData.token
       });
       
