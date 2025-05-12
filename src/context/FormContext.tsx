@@ -1,0 +1,335 @@
+
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { 
+  loadFormFromStorage, 
+  saveFormToStorage, 
+  clearStoredFormData 
+} from "@/utils/emailService";
+import { toast } from "sonner";
+
+export type ReelExample = {
+  id: string;
+  link: string;
+  comment: string;
+};
+
+export type FormState = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  cellPhone: string;
+  website: string;
+  problemSolved: string;
+  
+  tones: string[];
+  otherTone: string;
+  duration: string;
+  otherDuration: string;
+  reelExamples: ReelExample[];
+  footageLink: string;
+  footageTypes: string[];
+  otherFootageType: string;
+  scriptStructure: string;
+  nonNegotiableClips: string;
+  testimonials: string;
+  logoFolderLink: string;
+  deckFiles: File[];
+  credibilityMarkers: string[];
+  otherCredibilityMarker: string;
+  speakerBio: string;
+  speakerBioFiles: File[];
+  brandingGuidelinesFiles: File[];
+  additionalInfo: string;
+  step: number;
+};
+
+export const initialFormState: FormState = {
+  firstName: '',
+  lastName: '',
+  email: '',
+  cellPhone: '',
+  website: '',
+  problemSolved: '',
+  
+  tones: [],
+  otherTone: '',
+  duration: '',
+  otherDuration: '',
+  reelExamples: [],
+  footageLink: '',
+  footageTypes: [],
+  otherFootageType: '',
+  scriptStructure: '',
+  nonNegotiableClips: '',
+  testimonials: '',
+  logoFolderLink: '',
+  deckFiles: [],
+  credibilityMarkers: [],
+  otherCredibilityMarker: '',
+  speakerBio: '',
+  speakerBioFiles: [],
+  brandingGuidelinesFiles: [],
+  additionalInfo: '',
+  step: 1,
+};
+
+interface FormContextType {
+  formState: FormState;
+  updateForm: (key: keyof FormState, value: any) => void;
+  nextStep: () => void;
+  prevStep: () => void;
+  validateEmail: (email: string) => boolean;
+  validatePhoneNumber: (phone: string) => boolean;
+  isSubmitting: boolean;
+  setIsSubmitting: (value: boolean) => void;
+  handleSubmit: (e: React.FormEvent) => Promise<void>;
+}
+
+export const FormContext = createContext<FormContextType>({
+  formState: initialFormState,
+  updateForm: () => {},
+  nextStep: () => {},
+  prevStep: () => {},
+  validateEmail: () => false,
+  validatePhoneNumber: () => false,
+  isSubmitting: false,
+  setIsSubmitting: () => {},
+  handleSubmit: async () => {},
+});
+
+export const useFormContext = () => useContext(FormContext);
+
+export const FormProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [formState, setFormState] = useState<FormState>(initialFormState);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const totalSteps = 6;
+
+  const updateForm = (key: keyof FormState, value: any) => {
+    setFormState(prev => ({ ...prev, [key]: value }));
+  };
+
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+  
+  const validatePhoneNumber = (phone: string): boolean => {
+    const digits = phone.replace(/\D/g, '');
+    return digits.length >= 10;
+  };
+
+  const nextStep = () => {
+    let isValid = true;
+    let errorMessage = '';
+
+    switch (formState.step) {
+      case 1:
+        if (!formState.firstName.trim()) {
+          isValid = false;
+          errorMessage = 'Please enter your first name.';
+        } else if (!formState.lastName.trim()) {
+          isValid = false;
+          errorMessage = 'Please enter your last name.';
+        } else if (!formState.email.trim()) {
+          isValid = false;
+          errorMessage = 'Please enter your email address.';
+        } else if (!validateEmail(formState.email)) {
+          isValid = false;
+          errorMessage = 'Please enter a valid email address.';
+        } else if (!formState.cellPhone.trim()) {
+          isValid = false;
+          errorMessage = 'Please enter your cell phone number.';
+        } else if (!validatePhoneNumber(formState.cellPhone)) {
+          isValid = false;
+          errorMessage = 'Please enter a valid phone number (at least 10 digits).';
+        } else if (!formState.website.trim()) {
+          isValid = false;
+          errorMessage = 'Please enter your website or enter N/A if not applicable.';
+        } else if (!formState.problemSolved.trim()) {
+          isValid = false;
+          errorMessage = 'Please describe what problem you solve.';
+        }
+        break;
+      case 2:
+        if (formState.tones.length === 0) {
+          isValid = false;
+          errorMessage = 'Please select at least one tone.';
+        } else if (formState.tones.includes('other') && !formState.otherTone.trim()) {
+          isValid = false;
+          errorMessage = 'Please specify the other tone.';
+        } else if (!formState.duration) {
+          isValid = false;
+          errorMessage = 'Please select a duration.';
+        } else if (formState.duration === 'other' && !formState.otherDuration.trim()) {
+          isValid = false;
+          errorMessage = 'Please specify the other duration.';
+        } else if (formState.reelExamples.length === 0) {
+          isValid = false;
+          errorMessage = 'Please add at least one reel example.';
+        } else {
+          for (const example of formState.reelExamples) {
+            if (!example.link.trim() || !example.comment.trim()) {
+              isValid = false;
+              errorMessage = 'Please complete all fields for each reel example.';
+              break;
+            }
+          }
+        }
+        break;
+      case 3:
+        if (!formState.footageLink.trim()) {
+          isValid = false;
+          errorMessage = 'Please provide a link to your footage.';
+        } else if (formState.footageTypes.length === 0) {
+          isValid = false;
+          errorMessage = 'Please select at least one footage type.';
+        } else if (formState.footageTypes.includes('other') && !formState.otherFootageType.trim()) {
+          isValid = false;
+          errorMessage = 'Please specify the other footage type.';
+        }
+        break;
+      case 4:
+        if (!formState.scriptStructure.trim()) {
+          isValid = false;
+          errorMessage = 'Please provide a script structure.';
+        } else if (!formState.nonNegotiableClips.trim()) {
+          isValid = false;
+          errorMessage = 'Please provide non-negotiable clips.';
+        }
+        break;
+      case 5:
+        if (!formState.testimonials.trim()) {
+          isValid = false;
+          errorMessage = 'Please provide testimonials or enter N/A if not applicable.';
+        } else if (!formState.logoFolderLink.trim()) {
+          isValid = false;
+          errorMessage = 'Please provide a link to your logos or enter N/A if not applicable.';
+        } else if (formState.credibilityMarkers.length === 0) {
+          isValid = false;
+          errorMessage = 'Please select at least one credibility marker.';
+        } else if (formState.credibilityMarkers.includes('other') && !formState.otherCredibilityMarker.trim()) {
+          isValid = false;
+          errorMessage = 'Please specify the other credibility marker.';
+        } else if (!formState.speakerBio.trim()) {
+          isValid = false;
+          errorMessage = 'Please provide your speaker bio.';
+        }
+        break;
+    }
+
+    if (!isValid) {
+      toast.error("Required Field Missing", {
+        description: errorMessage,
+      });
+      return;
+    }
+
+    if (formState.step < totalSteps) {
+      updateForm('step', formState.step + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const prevStep = () => {
+    if (formState.step > 1) {
+      updateForm('step', formState.step - 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formState.additionalInfo.trim()) {
+      toast.error("Required Field Missing", {
+        description: "Please provide additional information or enter N/A if not applicable.",
+      });
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      // Import functions dynamically to avoid circular dependency
+      const { saveFormToSupabase, sendEmail, formatEmailBody } = await import("@/utils/emailService");
+      
+      // First save to Supabase
+      const { success, submissionId } = await saveFormToSupabase(formState);
+      
+      if (!success) {
+        throw new Error("Failed to save submission to database");
+      }
+      
+      // Then send email notification
+      const emailBody = formatEmailBody(formState);
+      
+      const emailSent = await sendEmail({
+        to: "cico@cicospace.com",
+        subject: `New Demo Reel Submission - ${formState.firstName} ${formState.lastName}`,
+        body: emailBody,
+      });
+      
+      if (emailSent) {
+        toast.success("Form submitted successfully!", {
+          description: "We'll be in touch with you soon about your demo reel!",
+        });
+        
+        clearStoredFormData();
+        setFormState(initialFormState);
+        updateForm('step', 1);
+      } else {
+        toast.error("Error sending email notification", {
+          description: "Your submission was saved but we couldn't send the notification email. Our team will still review your submission.",
+        });
+      }
+    } catch (error) {
+      console.error('Submission error:', error);
+      toast.error("Error submitting form", {
+        description: "Your data has been saved locally. You can try submitting again later.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  useEffect(() => {
+    const savedData = loadFormFromStorage();
+    if (savedData) {
+      toast.info("Found saved form data", {
+        description: "Your previous form data has been restored.",
+        action: {
+          label: "Clear",
+          onClick: () => {
+            clearStoredFormData();
+            setFormState(initialFormState);
+          }
+        }
+      });
+      setFormState(prev => ({ ...prev, ...savedData.data }));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (JSON.stringify(formState) !== JSON.stringify(initialFormState)) {
+      saveFormToStorage(formState);
+    }
+  }, [formState]);
+
+  return (
+    <FormContext.Provider 
+      value={{ 
+        formState, 
+        updateForm, 
+        nextStep, 
+        prevStep, 
+        validateEmail, 
+        validatePhoneNumber, 
+        isSubmitting, 
+        setIsSubmitting,
+        handleSubmit
+      }}
+    >
+      {children}
+    </FormContext.Provider>
+  );
+};

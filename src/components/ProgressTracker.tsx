@@ -30,9 +30,10 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({ currentStep, totalSte
         ))}
       </div>
       <div className="flex justify-between mt-2 text-xs text-gray-600">
-        <div>Project Details</div>
+        <div>Contact</div>
+        <div>Preferences</div>
         <div>Footage</div>
-        <div>Creative Direction</div>
+        <div>Direction</div>
         <div>Credibility</div>
         <div>Review</div>
       </div>
