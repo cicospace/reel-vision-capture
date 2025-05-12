@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -26,7 +25,6 @@ const Auth = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // Using the API key directly from the client instead of the auth.anon property
           'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4Y2NlaWdya3hjYXhzaWlrdXZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcwNjcxNzcsImV4cCI6MjA2MjY0MzE3N30.UBLIXXjHIoOMS0p6-Wyd0wvAAlNKFaAt-vMuiuVdm3Y`
         },
         body: JSON.stringify({ accessCode })
@@ -39,9 +37,8 @@ const Auth = () => {
       }
       
       // Use the custom token to sign in
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: 'admin@cicospace.com',
-        password: SECURE_ACCESS_CODE
+      const { data, error } = await supabase.auth.signInWithCustomToken({
+        token: responseData.token
       });
       
       if (error) throw error;

@@ -30,7 +30,7 @@ serve(async (req) => {
       );
     }
 
-    // Code is valid, create a Supabase client with service role to generate JWT
+    // Code is valid, create a Supabase client with service role to generate a custom token
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
@@ -42,23 +42,21 @@ serve(async (req) => {
       }
     );
     
-    // Generate a custom token for the admin access
-    const { data: tokenData, error: tokenError } = await supabaseAdmin.auth.admin.generateLink({
+    // Generate a custom token for authentication
+    const { data, error } = await supabaseAdmin.auth.admin.generateLink({
       type: 'magiclink',
       email: 'admin@cicospace.com',
     });
-
-    if (tokenError) {
-      throw tokenError;
+    
+    if (error) {
+      throw error;
     }
-
-    const properties = {
-      role: 'admin',
-      accessType: 'secure-code'
-    };
-
+    
+    // Return the token
     return new Response(
-      JSON.stringify({ token: tokenData?.properties?.hashed_token }),
+      JSON.stringify({ 
+        token: data.properties.token 
+      }),
       { 
         status: 200, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
