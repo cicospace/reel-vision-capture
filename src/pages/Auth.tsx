@@ -26,7 +26,8 @@ const Auth = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabase.auth.anon}`
+          // Using the API key directly from the client instead of the auth.anon property
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4Y2NlaWdya3hjYXhzaWlrdXZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcwNjcxNzcsImV4cCI6MjA2MjY0MzE3N30.UBLIXXjHIoOMS0p6-Wyd0wvAAlNKFaAt-vMuiuVdm3Y`
         },
         body: JSON.stringify({ accessCode })
       });
