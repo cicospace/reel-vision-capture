@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, Film, Clipboard, User, Video, Clapperboard, Sparkles, Check, Download } from "lucide-react";
 import AuthWrapper from "@/components/AuthWrapper";
 import { toast } from "sonner";
@@ -208,11 +208,24 @@ const SubmissionDetail = () => {
     });
   };
 
+  const getStatusBadgeVariant = (status: string) => {
+    switch(status) {
+      case 'new':
+        return { variant: "default" as const, label: "New" };
+      case 'in-review':
+        return { variant: "secondary" as const, label: "In Review" };
+      case 'complete':
+        return { variant: "outline" as const, label: "Complete" };
+      default:
+        return { variant: "default" as const, label: status };
+    }
+  };
+
   if (loading) {
     return (
       <AuthWrapper>
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
+        <div className="min-h-screen flex items-center justify-center bg-background">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
       </AuthWrapper>
     );
@@ -221,10 +234,10 @@ const SubmissionDetail = () => {
   if (!submission) {
     return (
       <AuthWrapper>
-        <div className="min-h-screen flex items-center justify-center">
+        <div className="min-h-screen flex items-center justify-center bg-background">
           <div className="text-center">
-            <h2 className="text-xl font-semibold">Submission not found</h2>
-            <p className="text-gray-500 mt-2">The requested submission could not be found.</p>
+            <h2 className="text-xl font-semibold text-foreground">Submission not found</h2>
+            <p className="text-muted-foreground mt-2">The requested submission could not be found.</p>
             <Button className="mt-4" onClick={() => navigate('/admin')}>
               Go Back to Dashboard
             </Button>
@@ -236,8 +249,8 @@ const SubmissionDetail = () => {
 
   return (
     <AuthWrapper>
-      <div className="min-h-screen bg-gray-50">
-        <header className="bg-white shadow-sm">
+      <div className="min-h-screen bg-background">
+        <header className="bg-card shadow">
           <div className="container max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center">
               <div className="flex items-center">
@@ -250,15 +263,15 @@ const SubmissionDetail = () => {
                   <ChevronLeft className="h-4 w-4 mr-1" />
                   Back
                 </Button>
-                <h1 className="text-xl font-semibold">
+                <h1 className="text-xl font-semibold text-foreground">
                   {submission.first_name} {submission.last_name}'s Submission
                 </h1>
               </div>
               
               <div className="flex items-center space-x-2">
-                <div className="text-sm text-gray-500 mr-2">Status:</div>
+                <div className="text-sm text-muted-foreground mr-2">Status:</div>
                 <select
-                  className="form-select border rounded-md px-3 py-1 text-sm"
+                  className="form-select border border-input rounded-md px-3 py-1 text-sm bg-background text-foreground"
                   value={submission.status}
                   onChange={(e) => updateStatus(e.target.value)}
                   disabled={updatingStatus}
@@ -277,52 +290,53 @@ const SubmissionDetail = () => {
             {/* Main content - submission details */}
             <div className="lg:col-span-2 space-y-6">
               <Card className="p-6">
-                <h2 className="text-lg font-medium flex items-center mb-4">
-                  <User className="h-5 w-5 mr-2 text-gray-600" />
+                <h2 className="text-lg font-medium flex items-center mb-4 text-foreground">
+                  <User className="h-5 w-5 mr-2 text-muted-foreground" />
                   Contact Information
                 </h2>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                   <div>
-                    <div className="text-sm font-medium text-gray-500">Name</div>
-                    <div>{submission.first_name} {submission.last_name}</div>
+                    <div className="text-sm font-medium text-muted-foreground">Name</div>
+                    <div className="text-foreground">{submission.first_name} {submission.last_name}</div>
                   </div>
                   <div>
-                    <div className="text-sm font-medium text-gray-500">Email</div>
-                    <div>{submission.email}</div>
+                    <div className="text-sm font-medium text-muted-foreground">Email</div>
+                    <div className="text-foreground">{submission.email}</div>
                   </div>
                   <div>
-                    <div className="text-sm font-medium text-gray-500">Phone</div>
-                    <div>{submission.cell_phone}</div>
+                    <div className="text-sm font-medium text-muted-foreground">Phone</div>
+                    <div className="text-foreground">{submission.cell_phone}</div>
                   </div>
                   <div>
-                    <div className="text-sm font-medium text-gray-500">Website</div>
-                    <div>{submission.website}</div>
+                    <div className="text-sm font-medium text-muted-foreground">Website</div>
+                    <div className="text-foreground">{submission.website}</div>
                   </div>
                 </div>
                 
                 <div>
-                  <div className="text-sm font-medium text-gray-500 mb-1">Problem Solved</div>
-                  <div className="bg-gray-50 p-3 rounded-md">{submission.problem_solved}</div>
+                  <div className="text-sm font-medium text-muted-foreground mb-1">Problem Solved</div>
+                  <div className="bg-secondary p-3 rounded-md text-foreground">{submission.problem_solved}</div>
                 </div>
               </Card>
               
+              {/* Project Preferences Card */}
               <Card className="p-6">
-                <h2 className="text-lg font-medium flex items-center mb-4">
-                  <Clipboard className="h-5 w-5 mr-2 text-gray-600" />
+                <h2 className="text-lg font-medium flex items-center mb-4 text-foreground">
+                  <Clipboard className="h-5 w-5 mr-2 text-muted-foreground" />
                   Project Preferences
                 </h2>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                   <div>
-                    <div className="text-sm font-medium text-gray-500">Tone</div>
-                    <div>
+                    <div className="text-sm font-medium text-muted-foreground">Tone</div>
+                    <div className="text-foreground">
                       {submission.tone.map((t) => t === 'other' ? submission.other_tone : t).join(', ')}
                     </div>
                   </div>
                   <div>
-                    <div className="text-sm font-medium text-gray-500">Duration</div>
-                    <div>
+                    <div className="text-sm font-medium text-muted-foreground">Duration</div>
+                    <div className="text-foreground">
                       {submission.duration === 'other' ? submission.other_duration : submission.duration}
                     </div>
                   </div>
@@ -330,17 +344,17 @@ const SubmissionDetail = () => {
                 
                 {reelExamples.length > 0 && (
                   <div>
-                    <div className="text-sm font-medium text-gray-500 mb-2">Reel Examples</div>
+                    <div className="text-sm font-medium text-muted-foreground mb-2">Reel Examples</div>
                     <div className="space-y-3">
                       {reelExamples.map((example, index) => (
-                        <div key={example.id} className="bg-gray-50 p-3 rounded-md">
+                        <div key={example.id} className="bg-secondary p-3 rounded-md">
                           <div className="flex items-center">
-                            <div className="font-medium">Example {index + 1}</div>
-                            <a href={example.link} target="_blank" rel="noopener noreferrer" className="ml-2 text-sm text-blue-500 hover:text-blue-700">
+                            <div className="font-medium text-foreground">Example {index + 1}</div>
+                            <a href={example.link} target="_blank" rel="noopener noreferrer" className="ml-2 text-sm text-blue-500 hover:text-blue-400">
                               View Link
                             </a>
                           </div>
-                          <div className="text-sm mt-1">{example.comment}</div>
+                          <div className="text-sm mt-1 text-foreground">{example.comment}</div>
                         </div>
                       ))}
                     </div>
@@ -348,63 +362,66 @@ const SubmissionDetail = () => {
                 )}
               </Card>
               
+              {/* Footage Submission Card */}
               <Card className="p-6">
-                <h2 className="text-lg font-medium flex items-center mb-4">
-                  <Video className="h-5 w-5 mr-2 text-gray-600" />
+                <h2 className="text-lg font-medium flex items-center mb-4 text-foreground">
+                  <Video className="h-5 w-5 mr-2 text-muted-foreground" />
                   Footage Submission
                 </h2>
                 
                 <div className="mb-4">
-                  <div className="text-sm font-medium text-gray-500 mb-1">Footage Link</div>
+                  <div className="text-sm font-medium text-muted-foreground mb-1">Footage Link</div>
                   <div className="flex items-center">
-                    <a href={submission.footage_link} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700">
+                    <a href={submission.footage_link} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-400">
                       {submission.footage_link}
                     </a>
                   </div>
                 </div>
                 
                 <div>
-                  <div className="text-sm font-medium text-gray-500 mb-1">Footage Types</div>
-                  <div>
+                  <div className="text-sm font-medium text-muted-foreground mb-1">Footage Types</div>
+                  <div className="text-foreground">
                     {submission.footage_types.map((t) => t === 'other' ? submission.other_footage_type : t).join(', ')}
                   </div>
                 </div>
               </Card>
               
+              {/* Creative Direction Card */}
               <Card className="p-6">
-                <h2 className="text-lg font-medium flex items-center mb-4">
-                  <Clapperboard className="h-5 w-5 mr-2 text-gray-600" />
+                <h2 className="text-lg font-medium flex items-center mb-4 text-foreground">
+                  <Clapperboard className="h-5 w-5 mr-2 text-muted-foreground" />
                   Creative Direction
                 </h2>
                 
                 <div className="mb-4">
-                  <div className="text-sm font-medium text-gray-500 mb-1">Script Structure</div>
-                  <div className="bg-gray-50 p-3 rounded-md whitespace-pre-line">{submission.script_structure}</div>
+                  <div className="text-sm font-medium text-muted-foreground mb-1">Script Structure</div>
+                  <div className="bg-secondary p-3 rounded-md whitespace-pre-line text-foreground">{submission.script_structure}</div>
                 </div>
                 
                 <div>
-                  <div className="text-sm font-medium text-gray-500 mb-1">Non-Negotiable Clips</div>
-                  <div className="bg-gray-50 p-3 rounded-md whitespace-pre-line">{submission.non_negotiable_clips}</div>
+                  <div className="text-sm font-medium text-muted-foreground mb-1">Non-Negotiable Clips</div>
+                  <div className="bg-secondary p-3 rounded-md whitespace-pre-line text-foreground">{submission.non_negotiable_clips}</div>
                 </div>
               </Card>
               
+              {/* Credibility & Social Proof Card */}
               <Card className="p-6">
-                <h2 className="text-lg font-medium flex items-center mb-4">
-                  <Sparkles className="h-5 w-5 mr-2 text-gray-600" />
+                <h2 className="text-lg font-medium flex items-center mb-4 text-foreground">
+                  <Sparkles className="h-5 w-5 mr-2 text-muted-foreground" />
                   Credibility & Social Proof
                 </h2>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                   <div>
-                    <div className="text-sm font-medium text-gray-500">Credibility Markers</div>
-                    <div>
+                    <div className="text-sm font-medium text-muted-foreground">Credibility Markers</div>
+                    <div className="text-foreground">
                       {submission.credibility_markers.map((t) => t === 'other' ? submission.other_credibility_marker : t).join(', ')}
                     </div>
                   </div>
                   <div>
-                    <div className="text-sm font-medium text-gray-500">Logo Folder Link</div>
+                    <div className="text-sm font-medium text-muted-foreground">Logo Folder Link</div>
                     <div>
-                      <a href={submission.logo_folder_link} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700">
+                      <a href={submission.logo_folder_link} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-400">
                         {submission.logo_folder_link}
                       </a>
                     </div>
@@ -412,45 +429,46 @@ const SubmissionDetail = () => {
                 </div>
                 
                 <div className="mb-4">
-                  <div className="text-sm font-medium text-gray-500 mb-1">Testimonials</div>
-                  <div className="bg-gray-50 p-3 rounded-md whitespace-pre-line">{submission.testimonials}</div>
+                  <div className="text-sm font-medium text-muted-foreground mb-1">Testimonials</div>
+                  <div className="bg-secondary p-3 rounded-md whitespace-pre-line text-foreground">{submission.testimonials}</div>
                 </div>
                 
                 <div>
-                  <div className="text-sm font-medium text-gray-500 mb-1">Speaker Bio</div>
-                  <div className="bg-gray-50 p-3 rounded-md whitespace-pre-line">{submission.speaker_bio}</div>
+                  <div className="text-sm font-medium text-muted-foreground mb-1">Speaker Bio</div>
+                  <div className="bg-secondary p-3 rounded-md whitespace-pre-line text-foreground">{submission.speaker_bio}</div>
                 </div>
               </Card>
               
+              {/* Final Details Card */}
               <Card className="p-6">
-                <h2 className="text-lg font-medium flex items-center mb-4">
-                  <Film className="h-5 w-5 mr-2 text-gray-600" />
+                <h2 className="text-lg font-medium flex items-center mb-4 text-foreground">
+                  <Film className="h-5 w-5 mr-2 text-muted-foreground" />
                   Final Details
                 </h2>
                 
                 <div>
-                  <div className="text-sm font-medium text-gray-500 mb-1">Additional Information</div>
-                  <div className="bg-gray-50 p-3 rounded-md whitespace-pre-line">{submission.additional_info}</div>
+                  <div className="text-sm font-medium text-muted-foreground mb-1">Additional Information</div>
+                  <div className="bg-secondary p-3 rounded-md whitespace-pre-line text-foreground">{submission.additional_info}</div>
                 </div>
               </Card>
             </div>
             
             {/* Sidebar - notes and files */}
             <div className="space-y-6">
-              {/* Files */}
+              {/* Files Card */}
               <Card className="p-6">
-                <h2 className="text-lg font-medium mb-4">Uploaded Files</h2>
+                <h2 className="text-lg font-medium mb-4 text-foreground">Uploaded Files</h2>
                 
                 {files.length === 0 ? (
-                  <div className="text-center py-6 text-gray-500">
+                  <div className="text-center py-6 text-muted-foreground">
                     No files uploaded
                   </div>
                 ) : (
                   <div className="space-y-2">
                     {files.map((file) => (
-                      <div key={file.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-md">
+                      <div key={file.id} className="flex items-center justify-between p-2 bg-secondary rounded-md">
                         <div className="flex items-center overflow-hidden">
-                          <div className="min-w-0 truncate">{file.file_name}</div>
+                          <div className="min-w-0 truncate text-foreground">{file.file_name}</div>
                         </div>
                         <Button size="sm" variant="ghost">
                           <Download className="h-4 w-4" />
@@ -461,9 +479,9 @@ const SubmissionDetail = () => {
                 )}
               </Card>
               
-              {/* Notes */}
+              {/* Notes Card */}
               <Card className="p-6">
-                <h2 className="text-lg font-medium mb-4">Notes</h2>
+                <h2 className="text-lg font-medium mb-4 text-foreground">Notes</h2>
                 
                 <div className="mb-4">
                   <Textarea
@@ -497,38 +515,38 @@ const SubmissionDetail = () => {
                 <Separator className="my-4" />
                 
                 {notes.length === 0 ? (
-                  <div className="text-center py-6 text-gray-500">
+                  <div className="text-center py-6 text-muted-foreground">
                     No notes yet
                   </div>
                 ) : (
                   <div className="space-y-4">
                     {notes.map((note) => (
-                      <div key={note.id} className="bg-gray-50 p-3 rounded-md">
+                      <div key={note.id} className="bg-secondary p-3 rounded-md">
                         <div className="flex justify-between items-start">
-                          <div className="text-sm font-medium">{note.created_by}</div>
-                          <div className="text-xs text-gray-500">{formatDate(note.created_at)}</div>
+                          <div className="text-sm font-medium text-foreground">{note.created_by}</div>
+                          <div className="text-xs text-muted-foreground">{formatDate(note.created_at)}</div>
                         </div>
-                        <div className="mt-2 whitespace-pre-line">{note.note}</div>
+                        <div className="mt-2 whitespace-pre-line text-foreground">{note.note}</div>
                       </div>
                     ))}
                   </div>
                 )}
               </Card>
               
-              {/* Metadata */}
+              {/* Metadata Card */}
               <Card className="p-4">
                 <div className="text-sm">
                   <div className="flex justify-between py-1">
-                    <span className="text-gray-500">Submitted:</span>
-                    <span>{formatDate(submission.created_at)}</span>
+                    <span className="text-muted-foreground">Submitted:</span>
+                    <span className="text-foreground">{formatDate(submission.created_at)}</span>
                   </div>
                   <div className="flex justify-between py-1">
-                    <span className="text-gray-500">Last Updated:</span>
-                    <span>{formatDate(submission.updated_at)}</span>
+                    <span className="text-muted-foreground">Last Updated:</span>
+                    <span className="text-foreground">{formatDate(submission.updated_at)}</span>
                   </div>
                   <div className="flex justify-between py-1">
-                    <span className="text-gray-500">ID:</span>
-                    <span className="font-mono text-xs">{submission.id}</span>
+                    <span className="text-muted-foreground">ID:</span>
+                    <span className="font-mono text-xs text-foreground">{submission.id}</span>
                   </div>
                 </div>
               </Card>
