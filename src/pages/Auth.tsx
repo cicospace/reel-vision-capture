@@ -23,8 +23,12 @@ const Auth = () => {
     try {
       // Validate the access code locally
       if (accessCode === SECURE_ACCESS_CODE) {
-        // Create an anonymous session using Supabase
-        const { data, error } = await supabase.auth.signInAnonymously();
+        // Create a session using email/pass with a secure admin account
+        // This approach works when anonymous auth is disabled
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: 'admin@cicospace.com',
+          password: SECURE_ACCESS_CODE // Using the secure access code as password
+        });
         
         if (error) throw error;
         
