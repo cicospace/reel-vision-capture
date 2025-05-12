@@ -1,4 +1,7 @@
 
-import { useToast, toast } from "sonner";
+// This file re-exports the toast functionality from sonner
+// Sonner only exports the 'toast' function, not 'useToast'
+import { toast } from "sonner";
 
-export { useToast, toast };
+// Export what's available from sonner
+export { toast };

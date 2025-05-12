@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { 
   loadFormFromStorage, 
@@ -250,10 +249,11 @@ export const FormProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsSubmitting(true);
     
     try {
+      console.log("Starting form submission process...");
+      console.log("Form state before submission:", JSON.stringify(formState, null, 2));
+      
       // Import functions dynamically to avoid circular dependency
       const { saveFormToSupabase, sendEmail, formatEmailBody } = await import("@/utils/emailService");
-      
-      console.log("Starting form submission process...");
       
       // First save to Supabase
       const { success, submissionId } = await saveFormToSupabase(formState);

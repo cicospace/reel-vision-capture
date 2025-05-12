@@ -97,6 +97,7 @@ export const saveFormToSupabase = async (formData: any): Promise<{ success: bool
     console.log('Cleaned submission object:', JSON.stringify(submission, null, 2));
     
     // First, insert the main submission
+    console.log('Attempting to insert submission to Supabase...');
     const { data: submissionData, error: submissionError } = await supabase
       .from('submissions')
       .insert([submission])
@@ -104,6 +105,7 @@ export const saveFormToSupabase = async (formData: any): Promise<{ success: bool
     
     if (submissionError) {
       console.error('Supabase submission error:', submissionError);
+      console.error('Error details:', submissionError.message, submissionError.details, submissionError.hint);
       throw submissionError;
     }
     
@@ -117,26 +119,34 @@ export const saveFormToSupabase = async (formData: any): Promise<{ success: bool
     
     // Then, insert reel examples if they exist
     if (formData.reelExamples && formData.reelExamples.length > 0) {
+      console.log('Inserting reel examples:', formData.reelExamples.length);
       const reelExamplesToInsert = formData.reelExamples.map((example: any) => ({
         submission_id: submissionId,
         link: example.link,
         comment: example.comment
       }));
       
-      console.log('Inserting reel examples:', reelExamplesToInsert);
-      const { error: reelExamplesError } = await supabase
+      console.log('Reel examples to insert:', reelExamplesToInsert);
+      const { data: reelData, error: reelExamplesError } = await supabase
         .from('reel_examples')
         .insert(reelExamplesToInsert);
       
       if (reelExamplesError) {
         console.error('Reel examples error:', reelExamplesError);
+        console.error('Error details:', reelExamplesError.message, reelExamplesError.details, reelExamplesError.hint);
         throw reelExamplesError;
       }
+      
+      console.log('Reel examples inserted successfully:', reelData);
     }
     
     return { success: true, submissionId };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error saving to Supabase:', error);
+    console.error('Error message:', error.message);
+    if (error.code) {
+      console.error('Error code:', error.code);
+    }
     return { success: false };
   }
 };
