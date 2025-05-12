@@ -21,22 +21,32 @@ const Auth = () => {
     setLoading(true);
     
     try {
-      // Validate the access code locally
-      if (accessCode === SECURE_ACCESS_CODE) {
-        // Create a session using email/pass with a secure admin account
-        // This approach works when anonymous auth is disabled
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: 'admin@cicospace.com',
-          password: SECURE_ACCESS_CODE // Using the secure access code as password
-        });
-        
-        if (error) throw error;
-        
-        toast.success("Access granted");
-        navigate("/admin");
-      } else {
-        throw new Error("Invalid access code");
+      // Call the edge function to validate the code and get a token
+      const response = await fetch('https://hxcceigrkxcaxsiikuvs.supabase.co/functions/v1/validate-access-code', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${supabase.auth.anon}`
+        },
+        body: JSON.stringify({ accessCode })
+      });
+      
+      const responseData = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(responseData.error || "Invalid access code");
       }
+      
+      // Use the custom token to sign in
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: 'admin@cicospace.com',
+        password: SECURE_ACCESS_CODE
+      });
+      
+      if (error) throw error;
+      
+      toast.success("Access granted");
+      navigate("/admin");
     } catch (error: any) {
       toast.error("Access denied", {
         description: error.message || "Please check your access code and try again"
