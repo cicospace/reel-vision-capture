@@ -60,6 +60,8 @@ export const clearStoredFormData = () => {
 // Function to save form data to Supabase
 export const saveFormToSupabase = async (formData: any): Promise<{ success: boolean, submissionId?: string }> => {
   try {
+    console.log('Saving submission to Supabase...');
+    
     // First, insert the main submission
     const { data: submissionData, error: submissionError } = await supabase
       .from('submissions')
@@ -91,9 +93,18 @@ export const saveFormToSupabase = async (formData: any): Promise<{ success: bool
       ])
       .select();
     
-    if (submissionError) throw submissionError;
+    if (submissionError) {
+      console.error('Supabase submission error:', submissionError);
+      throw submissionError;
+    }
+    
+    if (!submissionData || submissionData.length === 0) {
+      console.error('No submission data returned from Supabase');
+      throw new Error('No submission data returned');
+    }
     
     const submissionId = submissionData[0].id;
+    console.log('Submission created with ID:', submissionId);
     
     // Then, insert reel examples
     if (formData.reelExamples.length > 0) {
@@ -103,11 +114,15 @@ export const saveFormToSupabase = async (formData: any): Promise<{ success: bool
         comment: example.comment
       }));
       
+      console.log('Inserting reel examples:', reelExamplesToInsert);
       const { error: reelExamplesError } = await supabase
         .from('reel_examples')
         .insert(reelExamplesToInsert);
       
-      if (reelExamplesError) throw reelExamplesError;
+      if (reelExamplesError) {
+        console.error('Reel examples error:', reelExamplesError);
+        throw reelExamplesError;
+      }
     }
     
     // Handle file uploads separately if needed

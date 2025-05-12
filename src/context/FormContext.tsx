@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { 
   loadFormFromStorage, 
@@ -257,8 +256,14 @@ export const FormProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { success, submissionId } = await saveFormToSupabase(formState);
       
       if (!success) {
-        throw new Error("Failed to save submission to database");
+        console.error("Failed to save submission to database");
+        toast.error("Error saving submission", {
+          description: "We couldn't save your submission to our database. Please try again later.",
+        });
+        return;
       }
+      
+      console.log("Submission saved successfully with ID:", submissionId);
       
       // Then send email notification
       const emailBody = formatEmailBody(formState);
@@ -278,7 +283,7 @@ export const FormProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setFormState(initialFormState);
         updateForm('step', 1);
       } else {
-        toast.error("Error sending email notification", {
+        toast.warning("Submission saved but email notification failed", {
           description: "Your submission was saved but we couldn't send the notification email. Our team will still review your submission.",
         });
       }
