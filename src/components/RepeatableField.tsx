@@ -56,11 +56,11 @@ const RepeatableField: React.FC<RepeatableFieldProps> = ({
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <Label className="input-label">{label}</Label>
-        <p className="text-sm text-gray-500">{items.length} of {maxItems}</p>
+        <p className="text-sm text-muted-foreground">{items.length} of {maxItems}</p>
       </div>
       
       {items.map((item, index) => (
-        <div key={item.id} className="p-4 border rounded-md bg-gray-50 space-y-3">
+        <div key={item.id} className="p-4 border rounded-md bg-muted space-y-3">
           <div className="flex justify-between items-center">
             <h4 className="font-medium">Example {index + 1}</h4>
             {items.length > 1 && (
@@ -106,7 +106,7 @@ const RepeatableField: React.FC<RepeatableFieldProps> = ({
         <Button 
           variant="outline" 
           onClick={addItem}
-          className="w-full border-dashed border-gray-300 text-gray-500 hover:text-reel-accent"
+          className="w-full border-dashed border-border text-muted-foreground hover:text-reel-accent"
         >
           <PlusCircle size={16} className="mr-2" />
           Add Another Example

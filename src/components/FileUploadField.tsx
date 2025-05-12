@@ -47,11 +47,11 @@ const FileUploadField: React.FC<FileUploadFieldProps> = ({
   return (
     <div className="space-y-3">
       {label && <Label className="input-label">{label}</Label>}
-      {description && <p className="text-sm text-gray-500">{description}</p>}
+      {description && <p className="text-sm text-muted-foreground">{description}</p>}
       
       <div
         className={`border-2 border-dashed rounded-lg p-8 text-center ${
-          isDragging ? 'border-reel-accent bg-reel-accent/5' : 'border-gray-300'
+          isDragging ? 'border-reel-accent bg-reel-accent/5' : 'border-border'
         }`}
         onDragOver={(e) => {
           e.preventDefault();
@@ -68,14 +68,14 @@ const FileUploadField: React.FC<FileUploadFieldProps> = ({
           }
         }}
       >
-        <Upload size={32} className="mx-auto text-gray-400 mb-2" />
-        <p className="text-sm text-gray-600 mb-2">
+        <Upload size={32} className="mx-auto text-muted-foreground mb-2" />
+        <p className="text-sm text-foreground mb-2">
           Drag and drop your files here, or
         </p>
         <Button
           type="button"
           variant="outline"
-          className="bg-white"
+          className="bg-background"
           onClick={() => fileInputRef.current?.click()}
         >
           Browse Files
@@ -99,11 +99,11 @@ const FileUploadField: React.FC<FileUploadFieldProps> = ({
           <Label className="text-sm">Uploaded Files</Label>
           <div className="space-y-2">
             {files.map((file, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+              <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-md">
                 <div className="flex items-center space-x-2">
                   {getFileIcon(file)}
                   <span className="text-sm truncate max-w-[200px]">{file.name}</span>
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-muted-foreground">
                     {(file.size / 1024 / 1024).toFixed(2)} MB
                   </span>
                 </div>
@@ -111,7 +111,7 @@ const FileUploadField: React.FC<FileUploadFieldProps> = ({
                   variant="ghost"
                   size="sm"
                   onClick={() => removeFile(index)}
-                  className="h-8 w-8 p-0 text-gray-500"
+                  className="h-8 w-8 p-0 text-muted-foreground"
                 >
                   <X size={16} />
                 </Button>

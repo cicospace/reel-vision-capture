@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -305,14 +306,14 @@ const SubmissionForm: React.FC = () => {
     switch (formState.step) {
       case 1:
         return (
-          <div className="form-section border border-gray-200">
+          <div className="form-section border border-border">
             <h2 className="section-title">
               <User size={20} className="text-reel-accent" />
               Contact Information
             </h2>
-            <div className="mt-2 mb-6 bg-gray-50 p-3 rounded-md flex items-start">
-              <Info size={16} className="text-gray-500 mt-0.5 mr-2 flex-shrink-0" />
-              <p className="text-sm text-gray-600">All fields are required. Enter "N/A" if a text field is not applicable to you.</p>
+            <div className="mt-2 mb-6 bg-muted p-3 rounded-md flex items-start">
+              <Info size={16} className="text-muted-foreground mt-0.5 mr-2 flex-shrink-0" />
+              <p className="text-sm text-muted-foreground">All fields are required. Enter "N/A" if a text field is not applicable to you.</p>
             </div>
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -372,7 +373,7 @@ const SubmissionForm: React.FC = () => {
                   className="text-input"
                   required
                 />
-                <p className="text-sm text-gray-500 mt-1">Enter your website URL or N/A if you don't have one.</p>
+                <p className="text-sm text-muted-foreground mt-1">Enter your website URL or N/A if you don't have one.</p>
               </div>
               
               <div>
@@ -391,14 +392,14 @@ const SubmissionForm: React.FC = () => {
       
       case 2:
         return (
-          <div className="form-section border border-gray-200">
+          <div className="form-section border border-border">
             <h2 className="section-title">
               <Clipboard size={20} className="text-reel-accent" />
               Project Preferences
             </h2>
-            <div className="mt-2 mb-6 bg-gray-50 p-3 rounded-md flex items-start">
-              <Info size={16} className="text-gray-500 mt-0.5 mr-2 flex-shrink-0" />
-              <p className="text-sm text-gray-600">All fields are required. Enter "N/A" if a text field is not applicable to you.</p>
+            <div className="mt-2 mb-6 bg-muted p-3 rounded-md flex items-start">
+              <Info size={16} className="text-muted-foreground mt-0.5 mr-2 flex-shrink-0" />
+              <p className="text-sm text-muted-foreground">All fields are required. Enter "N/A" if a text field is not applicable to you.</p>
             </div>
             
             <div className="space-y-6">
@@ -437,14 +438,14 @@ const SubmissionForm: React.FC = () => {
       
       case 3:
         return (
-          <div className="form-section border border-gray-200">
+          <div className="form-section border border-border">
             <h2 className="section-title">
               <Video size={20} className="text-reel-accent" />
               Footage Submission
             </h2>
-            <div className="mt-2 mb-6 bg-gray-50 p-3 rounded-md flex items-start">
-              <Info size={16} className="text-gray-500 mt-0.5 mr-2 flex-shrink-0" />
-              <p className="text-sm text-gray-600">All fields are required. Enter "N/A" if a text field is not applicable to you.</p>
+            <div className="mt-2 mb-6 bg-muted p-3 rounded-md flex items-start">
+              <Info size={16} className="text-muted-foreground mt-0.5 mr-2 flex-shrink-0" />
+              <p className="text-sm text-muted-foreground">All fields are required. Enter "N/A" if a text field is not applicable to you.</p>
             </div>
             <div className="space-y-6">
               <div>
@@ -474,14 +475,14 @@ const SubmissionForm: React.FC = () => {
       
       case 4:
         return (
-          <div className="form-section border border-gray-200">
+          <div className="form-section border border-border">
             <h2 className="section-title">
               <Clapperboard size={20} className="text-reel-accent" />
               Creative Direction
             </h2>
-            <div className="mt-2 mb-6 bg-gray-50 p-3 rounded-md flex items-start">
-              <Info size={16} className="text-gray-500 mt-0.5 mr-2 flex-shrink-0" />
-              <p className="text-sm text-gray-600">All fields are required. Enter "N/A" if a text field is not applicable to you.</p>
+            <div className="mt-2 mb-6 bg-muted p-3 rounded-md flex items-start">
+              <Info size={16} className="text-muted-foreground mt-0.5 mr-2 flex-shrink-0" />
+              <p className="text-sm text-muted-foreground">All fields are required. Enter "N/A" if a text field is not applicable to you.</p>
             </div>
             <div className="space-y-6">
               <div>
@@ -511,14 +512,14 @@ const SubmissionForm: React.FC = () => {
       
       case 5:
         return (
-          <div className="form-section border border-gray-200">
+          <div className="form-section border border-border">
             <h2 className="section-title">
               <User size={20} className="text-reel-accent" />
               Credibility & Social Proof
             </h2>
-            <div className="mt-2 mb-6 bg-gray-50 p-3 rounded-md flex items-start">
-              <Info size={16} className="text-gray-500 mt-0.5 mr-2 flex-shrink-0" />
-              <p className="text-sm text-gray-600">All fields are required. Enter "N/A" if a text field is not applicable to you.</p>
+            <div className="mt-2 mb-6 bg-muted p-3 rounded-md flex items-start">
+              <Info size={16} className="text-muted-foreground mt-0.5 mr-2 flex-shrink-0" />
+              <p className="text-sm text-muted-foreground">All fields are required. Enter "N/A" if a text field is not applicable to you.</p>
             </div>
             <div className="space-y-6">
               <div>
@@ -541,7 +542,7 @@ const SubmissionForm: React.FC = () => {
                   className="text-input"
                   required
                 />
-                <p className="text-sm text-gray-500 mt-1">Upload all logos you'd like us to feature on your logo wall to a drive folder and share the link.</p>
+                <p className="text-sm text-muted-foreground mt-1">Upload all logos you'd like us to feature on your logo wall to a drive folder and share the link.</p>
               </div>
               
               <FileUploadField
@@ -601,14 +602,14 @@ const SubmissionForm: React.FC = () => {
       case 6:
         return (
           <div className="space-y-6">
-            <div className="form-section border border-gray-200">
+            <div className="form-section border border-border">
               <h2 className="section-title">
                 <Film size={20} className="text-reel-accent" />
                 Final Details
               </h2>
-              <div className="mt-2 mb-6 bg-gray-50 p-3 rounded-md flex items-start">
-                <Info size={16} className="text-gray-500 mt-0.5 mr-2 flex-shrink-0" />
-                <p className="text-sm text-gray-600">All fields are required. Enter "N/A" if a text field is not applicable to you.</p>
+              <div className="mt-2 mb-6 bg-muted p-3 rounded-md flex items-start">
+                <Info size={16} className="text-muted-foreground mt-0.5 mr-2 flex-shrink-0" />
+                <p className="text-sm text-muted-foreground">All fields are required. Enter "N/A" if a text field is not applicable to you.</p>
               </div>
               <div>
                 <Label className="input-label">Anything else you'd like us to know? *</Label>
@@ -622,12 +623,12 @@ const SubmissionForm: React.FC = () => {
               </div>
             </div>
             
-            <Card className="p-6 border-black/10 bg-gradient-to-b from-white to-gray-50">
+            <Card className="p-6 border-border bg-card">
               <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
                 <Sparkles size={18} className="text-reel-accent" />
                 Review Your Submission
               </h3>
-              <p className="text-sm text-gray-600 mb-6">
+              <p className="text-sm text-muted-foreground mb-6">
                 Once we receive all items, we'll review and confirm everything's good to go. If anything's missing, we'll reach out. Let's make something extraordinary.
               </p>
               <Button 
