@@ -24,7 +24,7 @@ const AuthWrapper = ({ children }: AuthWrapperProps) => {
           setAuthenticated(true);
         } else {
           navigate("/auth");
-          toast.error("Please sign in to access this page");
+          toast.error("Please enter access code to view this page");
         }
       } catch (error) {
         console.error("Auth error:", error);
@@ -56,8 +56,8 @@ const AuthWrapper = ({ children }: AuthWrapperProps) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }

@@ -45,14 +45,15 @@
     --sidebar-ring: 0 0% 60%;
   }
 
-  .dark {
+  /* Dark mode is now the default */
+  :root, .dark {
     --background: 0 0% 0%;
     --foreground: 0 0% 100%;
 
-    --card: 0 0% 0%;
+    --card: 0 0% 4%;
     --card-foreground: 0 0% 100%;
 
-    --popover: 0 0% 0%;
+    --popover: 0 0% 4%;
     --popover-foreground: 0 0% 100%;
 
     --primary: 0 0% 100%;
@@ -92,26 +93,26 @@
 
   body {
     @apply bg-background text-foreground;
-    background-image: radial-gradient(circle at 100% 0%, rgba(0, 0, 0, 0.03) 0%, rgba(0, 0, 0, 0) 50%);
+    background-image: radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0) 50%);
     background-attachment: fixed;
   }
 }
 
 @layer components {
   .section-title {
-    @apply text-xl font-semibold text-reel-blue flex items-center gap-2 mb-4;
+    @apply text-xl font-semibold text-foreground flex items-center gap-2 mb-4;
   }
   
   .form-section {
-    @apply bg-white rounded-lg shadow-md p-6 mb-6;
+    @apply bg-card rounded-lg shadow-md p-6 mb-6;
   }
   
   .input-label {
-    @apply block text-sm font-medium text-gray-700 mb-1;
+    @apply block text-sm font-medium text-foreground mb-1;
   }
   
   .text-input {
-    @apply w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-reel-accent;
+    @apply w-full border border-input rounded-md px-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-accent;
   }
   
   .progress-step {
@@ -119,7 +120,7 @@
   }
   
   .progress-step.active {
-    @apply bg-reel-accent text-black;
+    @apply bg-accent text-black;
   }
   
   .progress-step.completed {
@@ -127,7 +128,7 @@
   }
   
   .progress-step.incomplete {
-    @apply bg-gray-200 text-gray-500;
+    @apply bg-muted text-muted-foreground;
   }
   
   .progress-line {
@@ -135,7 +136,7 @@
   }
   
   .progress-line.active {
-    @apply bg-reel-accent;
+    @apply bg-accent;
   }
   
   .progress-line.completed {
@@ -143,6 +144,6 @@
   }
   
   .progress-line.incomplete {
-    @apply bg-gray-200;
+    @apply bg-muted;
   }
 }

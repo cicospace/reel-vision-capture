@@ -1,17 +1,18 @@
 
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Mail, Lock, ArrowRight } from "lucide-react";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { KeyRound } from "lucide-react";
+
+// The secure access code - in a real application, this would be stored securely
+const SECURE_ACCESS_CODE = "KJ7p#xF2@qT9!LzN5vR8";
 
 const Auth = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [accessCode, setAccessCode] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -20,18 +21,21 @@ const Auth = () => {
     setLoading(true);
     
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-      
-      if (error) throw error;
-      
-      toast.success("Login successful");
-      navigate("/admin");
+      // Validate the access code
+      if (accessCode === SECURE_ACCESS_CODE) {
+        // Use anonymous sign-in for the session
+        const { data, error } = await supabase.auth.signInAnonymously();
+        
+        if (error) throw error;
+        
+        toast.success("Access granted");
+        navigate("/admin");
+      } else {
+        throw new Error("Invalid access code");
+      }
     } catch (error: any) {
-      toast.error("Login failed", {
-        description: error.message || "Please check your credentials and try again"
+      toast.error("Access denied", {
+        description: error.message || "Please check your access code and try again"
       });
     } finally {
       setLoading(false);
@@ -39,8 +43,8 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <Card className="w-full max-w-md p-8">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+      <Card className="w-full max-w-md p-8 border-gray-800 bg-card text-card-foreground">
         <div className="flex items-center justify-center mb-6">
           <img 
             src="/lovable-uploads/a2a809e3-8770-41b2-bd3e-c4dc102d1aa9.png" 
@@ -48,44 +52,40 @@ const Auth = () => {
             className="h-16"
           />
         </div>
-        <h1 className="text-2xl font-bold text-center mb-6">Admin Login</h1>
+        <h1 className="text-2xl font-bold text-center mb-6 text-foreground">Admin Access</h1>
         
         <form onSubmit={handleLogin} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="pl-10"
-                required
-              />
+            <div className="flex items-center justify-center mb-4">
+              <KeyRound className="h-8 w-8 text-primary" />
             </div>
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="pl-10"
-                required
+            <p className="text-center text-muted-foreground mb-4">
+              Enter the secure access code to continue
+            </p>
+            <div className="flex justify-center">
+              <InputOTP 
+                maxLength={20} 
+                value={accessCode} 
+                onChange={setAccessCode}
+                render={({ slots }) => (
+                  <InputOTPGroup>
+                    {slots.map((slot, index) => (
+                      <InputOTPSlot 
+                        key={index} 
+                        {...slot} 
+                        index={index} 
+                        className="border-gray-700 bg-secondary text-foreground focus:border-accent"
+                      />
+                    ))}
+                  </InputOTPGroup>
+                )}
               />
             </div>
           </div>
           
           <Button 
             type="submit" 
-            className="w-full bg-black"
+            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
             disabled={loading}
           >
             {loading ? (
@@ -94,11 +94,11 @@ const Auth = () => {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                Signing In...
+                Verifying...
               </span>
             ) : (
               <span className="flex items-center">
-                Sign In <ArrowRight className="ml-2 h-4 w-4" />
+                Access Admin Dashboard
               </span>
             )}
           </Button>
