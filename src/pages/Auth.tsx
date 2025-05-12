@@ -23,11 +23,8 @@ const Auth = () => {
     try {
       // Validate the access code
       if (accessCode === SECURE_ACCESS_CODE) {
-        // Use anonymous sign-in for the session
-        const { data, error } = await supabase.auth.signInAnonymously();
-        
-        if (error) throw error;
-        
+        // Instead of anonymous sign-in, create a session in localStorage
+        localStorage.setItem('cicospace_admin_authorized', 'true');
         toast.success("Access granted");
         navigate("/admin");
       } else {
@@ -37,6 +34,7 @@ const Auth = () => {
       toast.error("Access denied", {
         description: error.message || "Please check your access code and try again"
       });
+      console.error("Authentication error:", error);
     } finally {
       setLoading(false);
     }
