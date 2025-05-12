@@ -2,7 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { 
   loadFormFromStorage, 
   saveFormToStorage, 
-  clearStoredFormData 
+  clearStoredFormData,
+  saveFormToSupabase
 } from "@/utils/emailService";
 import { toast } from "sonner";
 
@@ -252,9 +253,6 @@ export const FormProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log("Starting form submission process...");
       console.log("Form state before submission:", JSON.stringify(formState, null, 2));
       
-      // Import functions dynamically to avoid circular dependency
-      const { saveFormToSupabase, sendEmail, formatEmailBody } = await import("@/utils/emailService");
-      
       // First save to Supabase
       const { success, submissionId } = await saveFormToSupabase(formState);
       
@@ -269,28 +267,16 @@ export const FormProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       console.log("Submission saved successfully with ID:", submissionId);
       
-      // Then send email notification
-      const emailBody = formatEmailBody(formState);
-      
-      const emailSent = await sendEmail({
-        to: "cico@cicospace.com",
-        subject: `New Demo Reel Submission - ${formState.firstName} ${formState.lastName}`,
-        body: emailBody,
+      // Show success message
+      toast.success("Form submitted successfully!", {
+        description: "Your submission has been saved. We'll review it shortly.",
       });
       
-      if (emailSent) {
-        toast.success("Form submitted successfully!", {
-          description: "We'll be in touch with you soon about your demo reel!",
-        });
-        
-        clearStoredFormData();
-        setFormState(initialFormState);
-        updateForm('step', 1);
-      } else {
-        toast.warning("Submission saved but email notification failed", {
-          description: "Your submission was saved but we couldn't send the notification email. Our team will still review your submission.",
-        });
-      }
+      // Clear form data and reset form
+      clearStoredFormData();
+      setFormState(initialFormState);
+      updateForm('step', 1);
+      
     } catch (error) {
       console.error('Submission error:', error);
       toast.error("Error submitting form", {
