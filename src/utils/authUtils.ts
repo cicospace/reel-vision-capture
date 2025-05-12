@@ -19,8 +19,8 @@ export const simpleHash = (code: string): string => {
 export const SECURE_ACCESS_CODE = "KJ7p#xF2@qT9!LzN5vR8";
 export const HASHED_ACCESS_CODE = simpleHash(SECURE_ACCESS_CODE);
 
-// Email used for authentication
-export const ADMIN_EMAIL = "admin@cicospace-demo.com";
+// Email used for authentication - using a format that Supabase will accept
+export const ADMIN_EMAIL = "cicospace.demo+admin@gmail.com";
 
 // Check if the user is authenticated based on localStorage and session
 export const isAuthenticated = async (): Promise<boolean> => {
