@@ -21,14 +21,10 @@ const Auth = () => {
     setLoading(true);
     
     try {
-      // Validate the access code
+      // Validate the access code locally
       if (accessCode === SECURE_ACCESS_CODE) {
-        // Create an anonymous session using Supabase custom tokens
-        // This creates a session without email/password but maintains cookies
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: 'admin@cicospace.com',
-          password: 'KJ7p#xF2@qT9!LzN5vR8' // Using the same access code as password
-        });
+        // Create an anonymous session using Supabase
+        const { data, error } = await supabase.auth.signInAnonymously();
         
         if (error) throw error;
         
@@ -67,36 +63,20 @@ const Auth = () => {
             <p className="text-center text-muted-foreground mb-4">
               Enter the secure access code to continue
             </p>
-            <div className="flex justify-center mb-4">
-              <div className="max-w-[320px] overflow-hidden">
+            <div className="flex justify-center mb-4 overflow-x-auto pb-2">
+              <div className="max-w-full">
                 <InputOTP
                   maxLength={20}
                   value={accessCode}
                   onChange={setAccessCode}
                   pattern="^[A-Za-z0-9!@#$%^&*()_+-=[\]{}|;:,.<>/?]*$"
                   inputMode="text"
+                  className="flex flex-wrap"
                 >
-                  <InputOTPGroup>
-                    <InputOTPSlot index={0} />
-                    <InputOTPSlot index={1} />
-                    <InputOTPSlot index={2} />
-                    <InputOTPSlot index={3} />
-                    <InputOTPSlot index={4} />
-                    <InputOTPSlot index={5} />
-                    <InputOTPSlot index={6} />
-                    <InputOTPSlot index={7} />
-                    <InputOTPSlot index={8} />
-                    <InputOTPSlot index={9} />
-                    <InputOTPSlot index={10} />
-                    <InputOTPSlot index={11} />
-                    <InputOTPSlot index={12} />
-                    <InputOTPSlot index={13} />
-                    <InputOTPSlot index={14} />
-                    <InputOTPSlot index={15} />
-                    <InputOTPSlot index={16} />
-                    <InputOTPSlot index={17} />
-                    <InputOTPSlot index={18} />
-                    <InputOTPSlot index={19} />
+                  <InputOTPGroup className="flex flex-wrap gap-1 justify-center">
+                    {Array.from({ length: 20 }, (_, i) => (
+                      <InputOTPSlot key={i} index={i} className="w-8 h-9 text-xs" />
+                    ))}
                   </InputOTPGroup>
                 </InputOTP>
               </div>
