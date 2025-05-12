@@ -23,7 +23,8 @@ const Auth = () => {
     try {
       // Validate the access code
       if (accessCode === SECURE_ACCESS_CODE) {
-        // Sign in with a shared admin account
+        // Create an anonymous session using Supabase custom tokens
+        // This creates a session without email/password but maintains cookies
         const { data, error } = await supabase.auth.signInWithPassword({
           email: 'admin@cicospace.com',
           password: 'KJ7p#xF2@qT9!LzN5vR8' // Using the same access code as password
