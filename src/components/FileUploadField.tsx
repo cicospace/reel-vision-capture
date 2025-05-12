@@ -51,7 +51,7 @@ const FileUploadField: React.FC<FileUploadFieldProps> = ({
       
       <div
         className={`border-2 border-dashed rounded-lg p-8 text-center ${
-          isDragging ? 'border-reel-accent bg-reel-accent/5' : 'border-border'
+          isDragging ? 'border-accent bg-accent/5' : 'border-border'
         }`}
         onDragOver={(e) => {
           e.preventDefault();
@@ -75,7 +75,7 @@ const FileUploadField: React.FC<FileUploadFieldProps> = ({
         <Button
           type="button"
           variant="outline"
-          className="bg-background"
+          className="bg-background text-foreground"
           onClick={() => fileInputRef.current?.click()}
         >
           Browse Files
@@ -96,13 +96,13 @@ const FileUploadField: React.FC<FileUploadFieldProps> = ({
       
       {files.length > 0 && (
         <div className="space-y-2 mt-4">
-          <Label className="text-sm">Uploaded Files</Label>
+          <Label className="text-sm text-foreground">Uploaded Files</Label>
           <div className="space-y-2">
             {files.map((file, index) => (
               <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-md">
                 <div className="flex items-center space-x-2">
                   {getFileIcon(file)}
-                  <span className="text-sm truncate max-w-[200px]">{file.name}</span>
+                  <span className="text-sm text-foreground truncate max-w-[200px]">{file.name}</span>
                   <span className="text-xs text-muted-foreground">
                     {(file.size / 1024 / 1024).toFixed(2)} MB
                   </span>

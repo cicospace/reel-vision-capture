@@ -50,7 +50,7 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
               onCheckedChange={(checked) => handleCheckboxChange(checked as boolean, option.id)}
               required={required && selectedOptions.length === 0}
             />
-            <Label htmlFor={option.id} className="font-normal cursor-pointer">
+            <Label htmlFor={option.id} className="font-normal cursor-pointer text-foreground">
               {option.label}
             </Label>
           </div>
@@ -63,7 +63,7 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
               checked={selectedOptions.includes('other')}
               onCheckedChange={(checked) => handleCheckboxChange(checked as boolean, 'other')}
             />
-            <Label htmlFor="other" className="font-normal cursor-pointer">
+            <Label htmlFor="other" className="font-normal cursor-pointer text-foreground">
               Other
             </Label>
             {selectedOptions.includes('other') && (
@@ -71,7 +71,7 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
                 value={otherValue}
                 onChange={(e) => onOtherChange && onOtherChange(e.target.value)}
                 placeholder="Please specify"
-                className="ml-2"
+                className="ml-2 text-foreground"
                 required={selectedOptions.includes('other')}
               />
             )}

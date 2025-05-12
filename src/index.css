@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -94,6 +95,11 @@
     @apply bg-background text-foreground;
     background-image: radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0) 50%);
     background-attachment: fixed;
+  }
+  
+  /* Force text color for all form inputs */
+  input, textarea, select {
+    @apply text-foreground;
   }
 }
 

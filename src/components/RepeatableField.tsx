@@ -62,7 +62,7 @@ const RepeatableField: React.FC<RepeatableFieldProps> = ({
       {items.map((item, index) => (
         <div key={item.id} className="p-4 border rounded-md bg-muted space-y-3">
           <div className="flex justify-between items-center">
-            <h4 className="font-medium">Example {index + 1}</h4>
+            <h4 className="font-medium text-foreground">Example {index + 1}</h4>
             {items.length > 1 && (
               <Button 
                 variant="ghost" 
@@ -76,7 +76,7 @@ const RepeatableField: React.FC<RepeatableFieldProps> = ({
           </div>
           
           <div>
-            <Label htmlFor={`link-${item.id}`} className="text-sm">Demo Reel Link *</Label>
+            <Label htmlFor={`link-${item.id}`} className="text-sm text-foreground">Demo Reel Link *</Label>
             <Input
               id={`link-${item.id}`}
               value={item.link}
@@ -88,7 +88,7 @@ const RepeatableField: React.FC<RepeatableFieldProps> = ({
           </div>
           
           <div>
-            <Label htmlFor={`comment-${item.id}`} className="text-sm">What do you like about it? *</Label>
+            <Label htmlFor={`comment-${item.id}`} className="text-sm text-foreground">What do you like about it? *</Label>
             <Textarea
               id={`comment-${item.id}`}
               value={item.comment}
@@ -106,7 +106,7 @@ const RepeatableField: React.FC<RepeatableFieldProps> = ({
         <Button 
           variant="outline" 
           onClick={addItem}
-          className="w-full border-dashed border-border text-muted-foreground hover:text-reel-accent"
+          className="w-full border-dashed border-border text-foreground hover:text-accent"
         >
           <PlusCircle size={16} className="mr-2" />
           Add Another Example
