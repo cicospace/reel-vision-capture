@@ -1,6 +1,7 @@
 
 import { useEffect, useState, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 interface AuthWrapperProps {
@@ -13,11 +14,13 @@ const AuthWrapper = ({ children }: AuthWrapperProps) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const checkAuth = () => {
+    const checkAuth = async () => {
       try {
-        const isAuthorized = localStorage.getItem('cicospace_admin_authorized') === 'true';
+        const { data, error } = await supabase.auth.getSession();
         
-        if (isAuthorized) {
+        if (error) throw error;
+        
+        if (data?.session) {
           setAuthenticated(true);
         } else {
           navigate("/auth");
@@ -33,19 +36,21 @@ const AuthWrapper = ({ children }: AuthWrapperProps) => {
 
     checkAuth();
 
-    // Add event listener for storage changes (in case of multiple tabs)
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'cicospace_admin_authorized') {
-        if (e.newValue !== 'true') {
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (event === "SIGNED_IN" && session) {
+          setAuthenticated(true);
+        } else if (event === "SIGNED_OUT") {
           setAuthenticated(false);
           navigate("/auth");
         }
       }
-    };
+    );
 
-    window.addEventListener('storage', handleStorageChange);
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
+      if (authListener && authListener.subscription) {
+        authListener.subscription.unsubscribe();
+      }
     };
   }, [navigate]);
 

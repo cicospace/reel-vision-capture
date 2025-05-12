@@ -23,8 +23,14 @@ const Auth = () => {
     try {
       // Validate the access code
       if (accessCode === SECURE_ACCESS_CODE) {
-        // Instead of anonymous sign-in, create a session in localStorage
-        localStorage.setItem('cicospace_admin_authorized', 'true');
+        // Sign in with a shared admin account
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: 'admin@cicospace.com',
+          password: 'KJ7p#xF2@qT9!LzN5vR8' // Using the same access code as password
+        });
+        
+        if (error) throw error;
+        
         toast.success("Access granted");
         navigate("/admin");
       } else {
