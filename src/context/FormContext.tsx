@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { 
   loadFormFromStorage, 
@@ -252,6 +253,8 @@ export const FormProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Import functions dynamically to avoid circular dependency
       const { saveFormToSupabase, sendEmail, formatEmailBody } = await import("@/utils/emailService");
       
+      console.log("Starting form submission process...");
+      
       // First save to Supabase
       const { success, submissionId } = await saveFormToSupabase(formState);
       
@@ -260,6 +263,7 @@ export const FormProvider: React.FC<{ children: React.ReactNode }> = ({ children
         toast.error("Error saving submission", {
           description: "We couldn't save your submission to our database. Please try again later.",
         });
+        setIsSubmitting(false);
         return;
       }
       

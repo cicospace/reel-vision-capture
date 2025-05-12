@@ -61,36 +61,45 @@ export const clearStoredFormData = () => {
 export const saveFormToSupabase = async (formData: any): Promise<{ success: boolean, submissionId?: string }> => {
   try {
     console.log('Saving submission to Supabase...');
+    console.log('Form data to be submitted:', JSON.stringify(formData, null, 2));
+    
+    // Ensure arrays are proper arrays and not empty
+    const tones = Array.isArray(formData.tones) ? formData.tones : [];
+    const footageTypes = Array.isArray(formData.footageTypes) ? formData.footageTypes : [];
+    const credibilityMarkers = Array.isArray(formData.credibilityMarkers) ? formData.credibilityMarkers : [];
+    
+    // Create a clean submission object with only the fields expected by the database
+    const submission = {
+      first_name: formData.firstName,
+      last_name: formData.lastName,
+      email: formData.email,
+      cell_phone: formData.cellPhone,
+      website: formData.website,
+      problem_solved: formData.problemSolved,
+      tone: tones,
+      other_tone: formData.otherTone || null,
+      duration: formData.duration,
+      other_duration: formData.otherDuration || null,
+      footage_link: formData.footageLink,
+      footage_types: footageTypes,
+      other_footage_type: formData.otherFootageType || null,
+      script_structure: formData.scriptStructure,
+      non_negotiable_clips: formData.nonNegotiableClips,
+      testimonials: formData.testimonials,
+      logo_folder_link: formData.logoFolderLink,
+      credibility_markers: credibilityMarkers,
+      other_credibility_marker: formData.otherCredibilityMarker || null,
+      speaker_bio: formData.speakerBio,
+      additional_info: formData.additionalInfo,
+      status: 'new'
+    };
+    
+    console.log('Cleaned submission object:', JSON.stringify(submission, null, 2));
     
     // First, insert the main submission
     const { data: submissionData, error: submissionError } = await supabase
       .from('submissions')
-      .insert([
-        {
-          first_name: formData.firstName,
-          last_name: formData.lastName,
-          email: formData.email,
-          cell_phone: formData.cellPhone,
-          website: formData.website,
-          problem_solved: formData.problemSolved,
-          tone: formData.tones,
-          other_tone: formData.otherTone,
-          duration: formData.duration,
-          other_duration: formData.otherDuration,
-          footage_link: formData.footageLink,
-          footage_types: formData.footageTypes,
-          other_footage_type: formData.otherFootageType,
-          script_structure: formData.scriptStructure,
-          non_negotiable_clips: formData.nonNegotiableClips,
-          testimonials: formData.testimonials,
-          logo_folder_link: formData.logoFolderLink,
-          credibility_markers: formData.credibilityMarkers,
-          other_credibility_marker: formData.otherCredibilityMarker,
-          speaker_bio: formData.speakerBio,
-          additional_info: formData.additionalInfo,
-          status: 'new'
-        }
-      ])
+      .insert([submission])
       .select();
     
     if (submissionError) {
@@ -106,8 +115,8 @@ export const saveFormToSupabase = async (formData: any): Promise<{ success: bool
     const submissionId = submissionData[0].id;
     console.log('Submission created with ID:', submissionId);
     
-    // Then, insert reel examples
-    if (formData.reelExamples.length > 0) {
+    // Then, insert reel examples if they exist
+    if (formData.reelExamples && formData.reelExamples.length > 0) {
       const reelExamplesToInsert = formData.reelExamples.map((example: any) => ({
         submission_id: submissionId,
         link: example.link,
@@ -124,9 +133,6 @@ export const saveFormToSupabase = async (formData: any): Promise<{ success: bool
         throw reelExamplesError;
       }
     }
-    
-    // Handle file uploads separately if needed
-    // This would involve uploading to storage and then saving metadata
     
     return { success: true, submissionId };
   } catch (error) {
