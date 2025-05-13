@@ -58,33 +58,33 @@ export const saveFormToSupabase = async (formData: any): Promise<{ success: bool
     
     // Create a clean submission object with only the fields expected by the database
     const submission = {
-      first_name: formData.firstName,
-      last_name: formData.lastName,
-      email: formData.email,
-      cell_phone: formData.cellPhone,
-      website: formData.website,
-      problem_solved: formData.problemSolved,
+      first_name: formData.firstName || '',
+      last_name: formData.lastName || '',
+      email: formData.email || '',
+      cell_phone: formData.cellPhone || '',
+      website: formData.website || '',
+      problem_solved: formData.problemSolved || '',
       tone: tones,
       other_tone: formData.otherTone || null,
-      duration: formData.duration,
+      duration: formData.duration || '',
       other_duration: formData.otherDuration || null,
-      footage_link: formData.footageLink,
+      footage_link: formData.footageLink || '',
       footage_types: footageTypes,
       other_footage_type: formData.otherFootageType || null,
-      script_structure: formData.scriptStructure,
-      non_negotiable_clips: formData.nonNegotiableClips,
-      testimonials: formData.testimonials,
-      logo_folder_link: formData.logoFolderLink,
+      script_structure: formData.scriptStructure || '',
+      non_negotiable_clips: formData.nonNegotiableClips || '',
+      testimonials: formData.testimonials || '',
+      logo_folder_link: formData.logoFolderLink || '',
       credibility_markers: credibilityMarkers,
       other_credibility_marker: formData.otherCredibilityMarker || null,
-      speaker_bio: formData.speakerBio,
-      additional_info: formData.additionalInfo,
+      speaker_bio: formData.speakerBio || '',
+      additional_info: formData.additionalInfo || '',
       status: 'new'
     };
     
     console.log('Cleaned submission object:', JSON.stringify(submission, null, 2));
     
-    // First, insert the main submission
+    // First, insert the main submission - with detailed error logging
     console.log('Attempting to insert submission to Supabase...');
     const { data: submissionData, error: submissionError } = await supabase
       .from('submissions')
@@ -93,8 +93,11 @@ export const saveFormToSupabase = async (formData: any): Promise<{ success: bool
     
     if (submissionError) {
       console.error('Supabase submission error:', submissionError);
-      console.error('Error details:', submissionError.message, submissionError.details, submissionError.hint);
-      throw submissionError;
+      console.error('Error details:', submissionError.message);
+      console.error('Error code:', submissionError.code);
+      console.error('Error details:', submissionError.details);
+      console.error('Error hint:', submissionError.hint);
+      throw new Error(`Database error: ${submissionError.message}. Code: ${submissionError.code}`);
     }
     
     if (!submissionData || submissionData.length === 0) {
@@ -108,24 +111,28 @@ export const saveFormToSupabase = async (formData: any): Promise<{ success: bool
     // Then, insert reel examples if they exist
     if (formData.reelExamples && formData.reelExamples.length > 0) {
       console.log('Inserting reel examples:', formData.reelExamples.length);
+      
       const reelExamplesToInsert = formData.reelExamples.map((example: any) => ({
         submission_id: submissionId,
-        link: example.link,
-        comment: example.comment
+        link: example.link || '',
+        comment: example.comment || ''
       }));
       
       console.log('Reel examples to insert:', reelExamplesToInsert);
-      const { data: reelData, error: reelExamplesError } = await supabase
+      const { error: reelExamplesError } = await supabase
         .from('reel_examples')
         .insert(reelExamplesToInsert);
       
       if (reelExamplesError) {
         console.error('Reel examples error:', reelExamplesError);
-        console.error('Error details:', reelExamplesError.message, reelExamplesError.details, reelExamplesError.hint);
-        throw reelExamplesError;
+        console.error('Error details:', reelExamplesError.message);
+        console.error('Error code:', reelExamplesError.code);
+        console.error('Error details:', reelExamplesError.details);
+        console.error('Error hint:', reelExamplesError.hint);
+        // We'll continue even if reel examples fail, since the main submission was successful
       }
       
-      console.log('Reel examples inserted successfully:', reelData);
+      console.log('Reel examples inserted successfully');
     }
     
     return { success: true, submissionId };
