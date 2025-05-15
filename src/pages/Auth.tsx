@@ -10,6 +10,7 @@ import { KeyRound } from "lucide-react";
 import { validateAccessCode, ADMIN_EMAIL, setAuthenticatedState } from "@/utils/authUtils";
 
 const Auth = () => {
+  // Explicitly type the state as string to fix the TypeScript error
   const [accessCode, setAccessCode] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
