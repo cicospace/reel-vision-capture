@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -11,10 +12,22 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { useNavigate } from "react-router-dom";
-import { LogOut, Search, Filter, RefreshCw } from "lucide-react";
+import { LogOut, Search, Filter, RefreshCw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { logNavigation } from "@/utils/loggingUtils";
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { deleteSubmission } from "@/utils/submission/deleteSubmission";
 
 type Submission = {
   id: string;
@@ -30,6 +43,8 @@ const Admin = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("all");
+  const [submissionToDelete, setSubmissionToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const navigate = useNavigate();
 
   const fetchSubmissions = async () => {
@@ -82,6 +97,23 @@ const Admin = () => {
     console.log(`Navigating to submission detail: ${id}`);
     logNavigation("/admin", `/submission/${id}`, { id });
     navigate(`/submission/${id}`);
+  };
+
+  const handleDeleteSubmission = async () => {
+    if (!submissionToDelete) return;
+    
+    setIsDeleting(true);
+    try {
+      const success = await deleteSubmission(submissionToDelete);
+      if (success) {
+        toast.success("Submission deleted successfully");
+        // Update the submissions list
+        setSubmissions(submissions.filter(sub => sub.id !== submissionToDelete));
+      }
+    } finally {
+      setIsDeleting(false);
+      setSubmissionToDelete(null);
+    }
   };
 
   const filteredSubmissions = submissions.filter(sub => 
@@ -185,7 +217,7 @@ const Admin = () => {
                     <TableHead>Email</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Date</TableHead>
-                    <TableHead className="text-right">Action</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -202,13 +234,44 @@ const Admin = () => {
                       </TableCell>
                       <TableCell>{formatDate(submission.created_at)}</TableCell>
                       <TableCell className="text-right">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => viewSubmission(submission.id)}
-                        >
-                          View
-                        </Button>
+                        <div className="flex justify-end space-x-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => viewSubmission(submission.id)}
+                          >
+                            View
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button 
+                                variant="destructive" 
+                                size="sm"
+                                onClick={() => setSubmissionToDelete(submission.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete Submission</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to delete this submission from {submission.first_name} {submission.last_name}? This action cannot be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel onClick={() => setSubmissionToDelete(null)}>Cancel</AlertDialogCancel>
+                                <AlertDialogAction 
+                                  onClick={handleDeleteSubmission}
+                                  className="bg-red-500 hover:bg-red-600"
+                                  disabled={isDeleting}
+                                >
+                                  {isDeleting ? "Deleting..." : "Delete"}
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

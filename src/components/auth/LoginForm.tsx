@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { InputOTP } from "@/components/ui/input-otp";
@@ -125,7 +126,7 @@ const LoginForm = ({ onLoginSuccess }: LoginFormProps) => {
           Enter the secure access code to continue
         </p>
         <div className="flex justify-center mb-4">
-          <InputOTP value={accessCode} onChange={setAccessCode} />
+          <InputOTP value={accessCode} onChange={(value: string) => setAccessCode(value)} />
         </div>
       </div>
       
