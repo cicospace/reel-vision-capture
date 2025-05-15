@@ -7,13 +7,17 @@ export function prepareSubmissionData(formData: any) {
   const credibilityMarkers = Array.isArray(formData.credibilityMarkers) ? formData.credibilityMarkers : [];
   
   // Create a clean submission object with only the fields expected by the database
+  // Always provide fallback values for required fields to prevent null/undefined issues
   return {
+    // Required contact fields
     first_name: formData.firstName || '',
     last_name: formData.lastName || '',
     email: formData.email || '',
     cell_phone: formData.cellPhone || '',
     website: formData.website || '',
     problem_solved: formData.problemSolved || '',
+    
+    // Required preference fields
     tone: tones,
     other_tone: formData.otherTone || null,
     duration: formData.duration || '',

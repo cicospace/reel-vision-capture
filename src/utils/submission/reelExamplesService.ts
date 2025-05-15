@@ -2,57 +2,75 @@
 import { supabase } from "@/integrations/supabase/client";
 import { SubmissionResponse } from "../types";
 
-// Helper function to handle reel examples insertion
-export async function handleReelExamples(reelExamples: any[], submissionId: string): Promise<SubmissionResponse> {
-  console.log('Inserting reel examples:', reelExamples.length);
-  
-  const reelExamplesToInsert = reelExamples.map((example: any) => ({
-    submission_id: submissionId,
-    link: example.link || '',
-    comment: example.comment || ''
-  }));
-  
-  console.log('Reel examples to insert:', reelExamplesToInsert);
-  
-  // Get session information directly before reel examples submission
-  const { data: sessionData } = await supabase.auth.getSession();
-  console.log('Auth session before reel examples insert:', {
-    hasSession: !!sessionData.session,
-    role: sessionData.session ? 'authenticated' : 'anon'
-  });
-  
-  const { data: reelData, error: reelExamplesError } = await supabase
-    .from('reel_examples')
-    .insert(reelExamplesToInsert);
-  
-  console.log('Reel examples insert result:', reelData || 'No data returned');
-  
-  if (reelExamplesError) {
-    console.error('Reel examples error:', reelExamplesError);
-    console.error('Error message:', reelExamplesError.message);
-    console.error('Error code:', reelExamplesError.code);
-    console.error('Error details:', reelExamplesError.details);
+// Function to insert reel examples for a submission
+export const handleReelExamples = async (reelExamples: any[], submissionId: string): Promise<SubmissionResponse> => {
+  try {
+    console.log('Processing reel examples for submission:', submissionId);
     
-    // Check for RLS violation in reel_examples table too
-    if (reelExamplesError.code === '42501') {
-      console.error('RLS VIOLATION: Row Level Security policy issue on reel_examples table');
-      console.error('Check that the anon role has INSERT permission on reel_examples table');
-      console.error('Check that an appropriate RLS policy exists for anonymous inserts');
+    if (!submissionId) {
+      console.error('Missing submission ID for reel examples');
+      return {
+        success: true,
+        submissionId,
+        error: {
+          code: 'MISSING_SUBMISSION_ID',
+          message: 'Submission ID is required for reel examples'
+        }
+      };
+    }
+
+    // Validate and prepare reel examples for insertion
+    const formattedExamples = reelExamples
+      .filter(example => example && example.link && example.comment) // Filter out incomplete examples
+      .map(example => ({
+        submission_id: submissionId,
+        link: example.link || '', // Ensure link has a fallback
+        comment: example.comment || '' // Ensure comment has a fallback
+      }));
+
+    if (formattedExamples.length === 0) {
+      console.log('No valid reel examples to insert');
+      return { success: true, submissionId };
+    }
+
+    console.log('Inserting reel examples:', JSON.stringify(formattedExamples, null, 2));
+    
+    // Insert reel examples
+    const { error: reelError } = await supabase
+      .from('reel_examples')
+      .insert(formattedExamples);
+    
+    if (reelError) {
+      console.error('Error inserting reel examples:', reelError);
+      console.error('Error message:', reelError.message);
+      console.error('Error details:', reelError.details);
+      
+      // Main submission was successful, but reel examples failed
+      return {
+        success: true,
+        submissionId,
+        error: {
+          code: reelError.code,
+          message: 'Submission saved but reel examples failed: ' + reelError.message,
+          details: reelError
+        }
+      };
     }
     
-    // We'll continue even if reel examples fail, since the main submission was successful
-    // but we'll return information about the error
+    console.log(`Successfully inserted ${formattedExamples.length} reel examples`);
+    return { success: true, submissionId };
+  } catch (error: any) {
+    console.error('Error processing reel examples:', error);
+    
+    // Main submission was successful, but reel examples had an unexpected error
     return { 
       success: true, 
       submissionId,
       error: {
-        code: reelExamplesError.code,
-        message: 'Main submission succeeded but failed to save reel examples: ' + reelExamplesError.message,
-        details: reelExamplesError.details
+        code: 'REEL_EXAMPLES_ERROR',
+        message: 'Submission saved but reel examples failed: ' + (error.message || 'Unknown error'),
+        details: error
       }
     };
   }
-  
-  console.log('Reel examples inserted successfully');
-  return { success: true, submissionId };
-}
+};
