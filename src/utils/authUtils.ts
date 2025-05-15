@@ -24,20 +24,29 @@ export const ADMIN_EMAIL = "cicospace.demo+admin@gmail.com";
 
 // Check if the user is authenticated based on localStorage and session
 export const isAuthenticated = async (): Promise<boolean> => {
-  // First check localStorage
-  const localAuth = localStorage.getItem("cicospace_auth");
-  
-  if (localAuth) {
-    const auth = JSON.parse(localAuth);
-    if (auth.authenticated && new Date(auth.expiry) > new Date()) {
-      // Local storage says user is authenticated and not expired
-      return true;
+  try {
+    // First check localStorage as a fast path
+    const localAuth = localStorage.getItem("cicospace_auth");
+    
+    if (localAuth) {
+      const auth = JSON.parse(localAuth);
+      if (auth.authenticated && new Date(auth.expiry) > new Date()) {
+        // Local storage says user is authenticated and not expired
+        // Double-check with Supabase as the source of truth
+        const { data } = await supabase.auth.getSession();
+        if (data.session !== null) {
+          return true;
+        }
+      }
     }
+    
+    // If localStorage check failed, verify with Supabase session as the source of truth
+    const { data } = await supabase.auth.getSession();
+    return data.session !== null;
+  } catch (error) {
+    console.error("Auth check error:", error);
+    return false;
   }
-  
-  // Then verify with Supabase session as a fallback
-  const { data } = await supabase.auth.getSession();
-  return data.session !== null;
 };
 
 // Store authentication state in localStorage with expiry

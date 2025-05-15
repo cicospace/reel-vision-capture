@@ -1,6 +1,5 @@
-
 import { useEffect, useState, ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -12,10 +11,27 @@ const AuthWrapper = ({ children }: AuthWrapperProps) => {
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        // First set up the auth listener to avoid race conditions
+        const { data: authListener } = supabase.auth.onAuthStateChange(
+          (event, session) => {
+            console.log("Auth state change:", event);
+            if (event === "SIGNED_IN" && session) {
+              setAuthenticated(true);
+            } else if (event === "SIGNED_OUT") {
+              setAuthenticated(false);
+              if (location.pathname !== "/auth") {
+                navigate("/auth");
+              }
+            }
+          }
+        );
+        
+        // Then check for an existing session
         const { data, error } = await supabase.auth.getSession();
         
         if (error) {
@@ -25,8 +41,10 @@ const AuthWrapper = ({ children }: AuthWrapperProps) => {
         if (data?.session) {
           setAuthenticated(true);
         } else {
-          navigate("/auth");
-          toast.error("Please enter access code to view this page");
+          if (location.pathname !== "/auth") {
+            navigate("/auth");
+            toast.error("Please enter access code to view this page");
+          }
         }
       } catch (error: any) {
         console.error("Auth error:", error);
@@ -38,7 +56,9 @@ const AuthWrapper = ({ children }: AuthWrapperProps) => {
           });
         }
         
-        navigate("/auth");
+        if (location.pathname !== "/auth") {
+          navigate("/auth");
+        }
       } finally {
         setLoading(false);
       }
@@ -46,26 +66,10 @@ const AuthWrapper = ({ children }: AuthWrapperProps) => {
 
     checkAuth();
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (event === "SIGNED_IN" && session) {
-          setAuthenticated(true);
-        } else if (event === "SIGNED_OUT") {
-          setAuthenticated(false);
-          navigate("/auth");
-        } else if (event === "USER_UPDATED") {
-          // Handle user update events if needed
-          console.log("User updated event received");
-        }
-      }
-    );
-
     return () => {
-      if (authListener && authListener.subscription) {
-        authListener.subscription.unsubscribe();
-      }
+      // The subscription cleanup is handled inside the checkAuth function
     };
-  }, [navigate]);
+  }, [navigate, location.pathname]);
 
   if (loading) {
     return (
@@ -76,6 +80,11 @@ const AuthWrapper = ({ children }: AuthWrapperProps) => {
   }
 
   if (!authenticated) {
+    // If we're on the auth page and not authenticated, render the auth page
+    if (location.pathname === "/auth") {
+      return <>{children}</>;
+    }
+    // Otherwise, return null so the router can redirect
     return null;
   }
 

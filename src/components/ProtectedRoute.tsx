@@ -14,6 +14,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
 
   useEffect(() => {
     const checkAuth = async () => {
+      // Check both Supabase session and localStorage
       const isAuth = await isAuthenticated();
       setAuthenticated(isAuth);
       setLoading(false);
@@ -31,8 +32,8 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   }
 
   if (!authenticated) {
-    // Redirect to login page with the return url
-    return <Navigate to="/auth" state={{ from: location }} replace />;
+    // Store the current location to redirect back after login
+    return <Navigate to="/auth" state={{ from: location.pathname }} replace />;
   }
 
   return <>{children}</>;
