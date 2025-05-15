@@ -12,12 +12,23 @@ import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AuthWrapper from "./components/AuthWrapper";
 
-const queryClient = new QueryClient();
+// Create a new QueryClient instance with retry configuration
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false
+    }
+  }
+});
 
 const App = () => {
   // Force dark mode
   useEffect(() => {
     document.documentElement.classList.add('dark');
+    
+    // Log initial page load
+    console.log("App initialized, current path:", window.location.pathname);
   }, []);
 
   return (
@@ -32,11 +43,7 @@ const App = () => {
                 <Admin />
               </ProtectedRoute>
             } />
-            <Route path="/auth" element={
-              <AuthWrapper>
-                <Auth />
-              </AuthWrapper>
-            } />
+            <Route path="/auth" element={<Auth />} />
             <Route path="/submission/:id" element={
               <ProtectedRoute>
                 <SubmissionDetail />

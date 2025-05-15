@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -15,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { LogOut, Search, Filter, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import { logNavigation } from "@/utils/loggingUtils";
 
 type Submission = {
   id: string;
@@ -61,6 +61,7 @@ const Admin = () => {
   };
 
   useEffect(() => {
+    console.log("Admin page mounted");
     fetchSubmissions();
   }, [filter]);
 
@@ -78,6 +79,8 @@ const Admin = () => {
   };
 
   const viewSubmission = (id: string) => {
+    console.log(`Navigating to submission detail: ${id}`);
+    logNavigation("/admin", `/submission/${id}`, { id });
     navigate(`/submission/${id}`);
   };
 

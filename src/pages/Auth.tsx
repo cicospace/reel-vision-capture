@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useLocation } from "react-router-dom";
 import LoginForm from "@/components/auth/LoginForm";
 import LoadingSpinner from "@/components/ui/loading-spinner";
+import { logAuthState, logNavigation } from "@/utils/loggingUtils";
 
 const Auth = () => {
   const [authChecked, setAuthChecked] = useState(false);
@@ -13,12 +14,25 @@ const Auth = () => {
   
   // Check if user is already authenticated on component mount
   useEffect(() => {
+    console.log("Auth page mounted, location state:", JSON.stringify(location.state));
+    
     const checkExistingAuth = async () => {
       try {
         const { data } = await supabase.auth.getSession();
+        
         if (data.session) {
+          console.log("Auth page: User already authenticated");
+          await logAuthState();
+          
           const from = location.state?.from || "/admin";
-          navigate(from, { replace: true });
+          console.log("Auth page: Redirecting to:", from);
+          logNavigation("/auth", from, { reason: "already_authenticated" });
+          
+          setTimeout(() => {
+            navigate(from, { replace: true });
+          }, 100); // Small delay to ensure state updates
+        } else {
+          console.log("Auth page: User not authenticated");
         }
       } catch (error) {
         console.error("Auth check error:", error);
