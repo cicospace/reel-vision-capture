@@ -1,0 +1,120 @@
+
+import { supabase } from "@/integrations/supabase/client";
+import { logAuthState, logSupabaseConnection } from "../loggingUtils";
+import { prepareSubmissionData } from "./submissionDataFormatter";
+import { handleReelExamples } from "./reelExamplesService";
+import { SubmissionResponse } from "../types";
+
+// Main function to save form data to Supabase
+export const saveFormToSupabase = async (formData: any): Promise<SubmissionResponse> => {
+  try {
+    console.log('Saving submission to Supabase...');
+    console.log('Form data to be submitted:', JSON.stringify(formData, null, 2));
+    
+    // Log authentication and connection state
+    await logAuthState();
+    logSupabaseConnection();
+    
+    // Create a clean submission object
+    const submission = prepareSubmissionData(formData);
+    console.log('Cleaned submission object:', JSON.stringify(submission, null, 2));
+    console.log('Submission keys:', JSON.stringify(Object.keys(submission)));
+    
+    // Get session information directly before submission attempt
+    const { data: sessionData } = await supabase.auth.getSession();
+    console.log('Auth session before submission:', {
+      hasSession: !!sessionData.session,
+      role: sessionData.session ? 'authenticated' : 'anon',
+      expiresAt: sessionData.session ? new Date(sessionData.session.expires_at * 1000).toISOString() : 'N/A'
+    });
+    
+    // Log request details that will be used
+    console.log('Attempting to insert submission to Supabase...');
+    console.log('Supabase URL:', "https://hxcceigrkxcaxsiikuvs.supabase.co");
+    console.log('FROM call:', 'submissions');
+    console.log('Client config:', {
+      persistSession: false,
+      autoRefreshToken: false
+    });
+    
+    // Insert the main submission with proper await and error checking
+    const { data: submissionData, error: submissionError } = await supabase
+      .from('submissions')
+      .insert([submission])
+      .select();
+    
+    if (submissionError) {
+      return handleSubmissionError(submissionError);
+    }
+    
+    // Log successful insert data
+    console.log('Insert success:', submissionData);
+    
+    if (!submissionData || submissionData.length === 0) {
+      console.error('No submission data returned from Supabase');
+      return { 
+        success: false, 
+        error: {
+          code: 'NO_DATA_RETURNED',
+          message: 'No submission data returned from database'
+        } 
+      };
+    }
+    
+    const submissionId = submissionData[0].id;
+    console.log('Submission created with ID:', submissionId);
+    
+    // Insert reel examples if they exist
+    if (formData.reelExamples && formData.reelExamples.length > 0) {
+      return await handleReelExamples(formData.reelExamples, submissionId);
+    }
+    
+    return { success: true, submissionId };
+  } catch (error: any) {
+    console.error('Error saving to Supabase:', error);
+    console.error('Error message:', error.message);
+    if (error.code) {
+      console.error('Error code:', error.code);
+    }
+    
+    return { 
+      success: false, 
+      error: {
+        code: error.code || 'UNKNOWN_ERROR',
+        message: error.message || 'An unknown error occurred',
+        details: error
+      }
+    };
+  }
+};
+
+// Helper function to handle submission errors
+function handleSubmissionError(submissionError: any): SubmissionResponse {
+  console.error('Supabase submission error:', submissionError);
+  console.error('Error message:', submissionError.message);
+  console.error('Error code:', submissionError.code);
+  console.error('Error details:', submissionError.details);
+  
+  // Enhanced RLS error detection and logging
+  if (submissionError.code === '42501') {
+    console.error('RLS VIOLATION: This is likely a Row Level Security policy issue');
+    console.error('Check that the anon role has INSERT permission on submissions table');
+    console.error('Check that an appropriate RLS policy exists for anonymous inserts');
+    console.error('Suggested fix: Run the SQL provided to grant INSERT permission and create proper policies');
+  } else if (submissionError.code === 'PGRST301' || submissionError.message.includes('permission denied')) {
+    console.error('PERMISSION DENIED: The current role does not have permission to perform this action');
+    console.error('Ensure the anon role has been granted INSERT permission on the submissions table');
+  }
+  
+  return { 
+    success: false, 
+    error: {
+      code: submissionError.code,
+      message: submissionError.message,
+      details: {
+        hint: submissionError.hint,
+        details: submissionError.details
+      }
+    } 
+  };
+}
