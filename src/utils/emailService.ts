@@ -1,4 +1,3 @@
-
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -50,7 +49,7 @@ export const saveFormToSupabase = async (formData: any): Promise<{ success: bool
   try {
     console.log('Saving submission to Supabase...');
     console.log('Form data to be submitted:', JSON.stringify(formData, null, 2));
-    console.log('Supabase URL being used:', supabase.supabaseUrl);
+    console.log('Supabase URL being used:', supabase.supabaseUrl ? 'Connected' : 'Unknown');
     
     // Ensure arrays are proper arrays and not empty
     const tones = Array.isArray(formData.tones) ? formData.tones : [];
@@ -98,7 +97,6 @@ export const saveFormToSupabase = async (formData: any): Promise<{ success: bool
       console.error('Error code:', submissionError.code);
       console.error('Error details:', submissionError.details);
       
-      // Already using anonymous permissions after granting INSERT to anon role
       return { 
         success: false, 
         error: {
