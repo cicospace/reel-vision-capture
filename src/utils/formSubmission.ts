@@ -26,6 +26,7 @@ export const saveFormToSupabase = async (formData: any): Promise<SubmissionRespo
     // Create a clean submission object
     const submission = prepareSubmissionData(formData);
     console.log('Cleaned submission object:', JSON.stringify(submission, null, 2));
+    console.log('Submission keys:', JSON.stringify(Object.keys(submission)));
     
     // Get session information directly before submission attempt
     const { data: sessionData } = await supabase.auth.getSession();
