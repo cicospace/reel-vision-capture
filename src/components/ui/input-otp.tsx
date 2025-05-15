@@ -5,8 +5,8 @@ import { Dot } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
-// Define our custom props interface that includes the string-based onChange
-type InputOTPProps = React.ComponentPropsWithoutRef<typeof OTPInput> & {
+// Use Omit to properly override the onChange prop type from the original OTPInput component
+type InputOTPProps = Omit<React.ComponentPropsWithoutRef<typeof OTPInput>, 'onChange'> & {
   onChange: (value: string) => void;
   value?: string;
 };
