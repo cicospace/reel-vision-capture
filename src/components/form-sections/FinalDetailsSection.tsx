@@ -42,7 +42,11 @@ const FinalDetailsSection: React.FC = () => {
           Once we receive all items, we'll review and confirm everything's good to go. If anything's missing, we'll reach out. Let's make something extraordinary.
         </p>
         <Button 
-          onClick={handleSubmit}
+          onClick={(e) => {
+            e.preventDefault();
+            console.log("Submit button clicked");
+            handleSubmit(e);
+          }}
           className="w-full bg-black hover:bg-gray-800 text-white"
           disabled={isSubmitting}
         >
