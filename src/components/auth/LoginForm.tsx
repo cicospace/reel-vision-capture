@@ -13,6 +13,7 @@ interface LoginFormProps {
 }
 
 const LoginForm = ({ onLoginSuccess }: LoginFormProps) => {
+  // Fix the TypeScript error by explicitly typing the state
   const [accessCode, setAccessCode] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
