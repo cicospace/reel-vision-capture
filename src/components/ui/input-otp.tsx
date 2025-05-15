@@ -5,25 +5,37 @@ import { Dot } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
+// Define our custom props interface that includes the string-based onChange
 type InputOTPProps = React.ComponentPropsWithoutRef<typeof OTPInput> & {
   onChange: (value: string) => void;
+  value?: string;
 };
 
 const InputOTP = React.forwardRef<
   React.ElementRef<typeof OTPInput>,
   InputOTPProps
->(({ className, containerClassName, onChange, ...props }, ref) => (
-  <OTPInput
-    ref={ref}
-    containerClassName={cn(
-      "flex items-center gap-2 has-[:disabled]:opacity-50",
-      containerClassName
-    )}
-    className={cn("disabled:cursor-not-allowed", className)}
-    onChange={onChange}
-    {...props}
-  />
-))
+>(({ className, containerClassName, onChange, value, ...props }, ref) => {
+  // Create an adapter function that will convert the library's onChange callback
+  // to our string-based onChange
+  const handleChange = React.useCallback((val: any) => {
+    // Call our consumer's onChange with the string value
+    onChange(String(val));
+  }, [onChange]);
+  
+  return (
+    <OTPInput
+      ref={ref}
+      containerClassName={cn(
+        "flex items-center gap-2 has-[:disabled]:opacity-50",
+        containerClassName
+      )}
+      className={cn("disabled:cursor-not-allowed", className)}
+      onChange={handleChange}
+      value={value}
+      {...props}
+    />
+  )
+})
 InputOTP.displayName = "InputOTP"
 
 const InputOTPGroup = React.forwardRef<
