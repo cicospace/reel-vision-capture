@@ -135,7 +135,7 @@ const LoginForm = ({ onLoginSuccess }: LoginFormProps) => {
             <InputOTP
               maxLength={20}
               value={accessCode}
-              onChange={handleOTPChange as unknown as (val: never) => void}
+              onChange={handleOTPChange}
               pattern="^[A-Za-z0-9!@#$%^&*()_+-=[\]{}|;:,.<>/?]*$"
               inputMode="text"
               className="flex flex-wrap"

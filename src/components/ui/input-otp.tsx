@@ -1,12 +1,17 @@
+
 import * as React from "react"
 import { OTPInput, OTPInputContext } from "input-otp"
 import { Dot } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
+type InputOTPProps = React.ComponentPropsWithoutRef<typeof OTPInput> & {
+  onChange?: (value: string) => void;
+};
+
 const InputOTP = React.forwardRef<
   React.ElementRef<typeof OTPInput>,
-  React.ComponentPropsWithoutRef<typeof OTPInput>
+  InputOTPProps
 >(({ className, containerClassName, ...props }, ref) => (
   <OTPInput
     ref={ref}
