@@ -107,6 +107,13 @@ export const saveFormToSupabase = async (formData: any): Promise<{ success: bool
     
     // Insert the main submission with comprehensive error logging
     console.log('Attempting to insert submission to Supabase...');
+    
+    // Log the actual URL being used (for debugging)
+    console.log('Supabase URL:', supabase.supabaseUrl);
+    
+    // Log the exact FROM call being made
+    console.log('FROM call:', 'submissions');
+    
     const { data: submissionData, error: submissionError } = await supabase
       .from('submissions')
       .insert([submission])
