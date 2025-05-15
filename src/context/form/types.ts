@@ -25,12 +25,12 @@ export type FormState = {
   nonNegotiableClips: string;
   testimonials: string;
   logoFolderLink: string;
-  deckFiles: File[];
+  deckFilesLink: string;
   credibilityMarkers: string[];
   otherCredibilityMarker: string;
   speakerBio: string;
-  speakerBioFiles: File[];
-  brandingGuidelinesFiles: File[];
+  speakerBioFilesLink: string;
+  brandingGuidelinesFilesLink: string;
   additionalInfo: string;
   step: number;
 };
@@ -55,12 +55,12 @@ export const initialFormState: FormState = {
   nonNegotiableClips: '',
   testimonials: '',
   logoFolderLink: '',
-  deckFiles: [],
+  deckFilesLink: '',
   credibilityMarkers: [],
   otherCredibilityMarker: '',
   speakerBio: '',
-  speakerBioFiles: [],
-  brandingGuidelinesFiles: [],
+  speakerBioFilesLink: '',
+  brandingGuidelinesFilesLink: '',
   additionalInfo: '',
   step: 1,
 };

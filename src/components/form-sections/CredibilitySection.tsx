@@ -4,7 +4,6 @@ import { User, Info } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import FileUploadField from "@/components/FileUploadField";
 import CheckboxGroup from "@/components/CheckboxGroup";
 import { useFormContext } from "@/context/FormContext";
 
@@ -52,25 +51,29 @@ const CredibilitySection: React.FC = () => {
           <p className="text-sm text-muted-foreground mt-1">Upload all logos you'd like us to feature on your logo wall to a drive folder and share the link.</p>
         </div>
         
-        <FileUploadField
-          label="Upload your keynote slide deck or key visuals of your framework (highly recommended) *"
-          description="Share your presentation materials to help us visualize your content"
-          accept=".pdf,.ppt,.pptx,.key"
-          multiple={false}
-          files={formState.deckFiles}
-          onChange={(files) => updateForm('deckFiles', files)}
-          required={true}
-        />
+        <div>
+          <Label className="input-label">Paste the Google Drive or Dropbox link to your keynote slide deck or key visuals (highly recommended) *</Label>
+          <Input
+            value={formState.deckFilesLink}
+            onChange={(e) => updateForm('deckFilesLink', e.target.value)}
+            placeholder="https://drive.google.com/... or enter N/A if not applicable"
+            className="text-input"
+            required
+          />
+          <p className="text-sm text-muted-foreground mt-1">Share your presentation materials to help us visualize your content.</p>
+        </div>
         
-        <FileUploadField
-          label="Upload any branding guidelines *"
-          description="Share your brand guidelines to ensure we maintain your brand consistency"
-          accept=".pdf,.doc,.docx,.jpg,.png"
-          multiple={true}
-          files={formState.brandingGuidelinesFiles}
-          onChange={(files) => updateForm('brandingGuidelinesFiles', files)}
-          required={false}
-        />
+        <div>
+          <Label className="input-label">Paste the Google Drive or Dropbox link to your branding guidelines *</Label>
+          <Input
+            value={formState.brandingGuidelinesFilesLink}
+            onChange={(e) => updateForm('brandingGuidelinesFilesLink', e.target.value)}
+            placeholder="https://drive.google.com/... or enter N/A if not applicable"
+            className="text-input"
+            required
+          />
+          <p className="text-sm text-muted-foreground mt-1">Share your brand guidelines to ensure we maintain your brand consistency.</p>
+        </div>
         
         <CheckboxGroup
           label="Which credibility markers apply to you? *"
@@ -88,19 +91,21 @@ const CredibilitySection: React.FC = () => {
           <Textarea
             value={formState.speakerBio}
             onChange={(e) => updateForm('speakerBio', e.target.value)}
-            placeholder="Paste your speaker bio here or upload a file below..."
+            placeholder="Paste your speaker bio here..."
             className="text-input h-24 mb-3"
             required
           />
-          <FileUploadField
-            label=""
-            description="Optional: Upload your bio as a document instead of typing it above"
-            accept=".pdf,.doc,.docx,.txt"
-            multiple={false}
-            files={formState.speakerBioFiles}
-            onChange={(files) => updateForm('speakerBioFiles', files)}
-            required={false}
+        </div>
+        
+        <div>
+          <Label className="input-label">Paste the Google Drive or Dropbox link to your speaker bio files (optional)</Label>
+          <Input
+            value={formState.speakerBioFilesLink}
+            onChange={(e) => updateForm('speakerBioFilesLink', e.target.value)}
+            placeholder="https://drive.google.com/... or enter N/A if not applicable"
+            className="text-input"
           />
+          <p className="text-sm text-muted-foreground mt-1">Optional: Share any additional speaker bio documents.</p>
         </div>
       </div>
     </div>

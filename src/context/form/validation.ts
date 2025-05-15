@@ -100,6 +100,12 @@ export const validateStep = (
       } else if (!formState.logoFolderLink.trim()) {
         isValid = false;
         errorMessage = 'Please provide a link to your logos or enter N/A if not applicable.';
+      } else if (!formState.deckFilesLink.trim()) {
+        isValid = false;
+        errorMessage = 'Please provide a link to your slide deck or enter N/A if not applicable.';
+      } else if (!formState.brandingGuidelinesFilesLink.trim()) {
+        isValid = false;
+        errorMessage = 'Please provide a link to your branding guidelines or enter N/A if not applicable.';
       } else if (formState.credibilityMarkers.length === 0) {
         isValid = false;
         errorMessage = 'Please select at least one credibility marker.';
