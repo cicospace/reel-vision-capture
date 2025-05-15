@@ -50,7 +50,21 @@ export const saveFormToSupabase = async (formData: any): Promise<{ success: bool
   try {
     console.log('Saving submission to Supabase...');
     console.log('Form data to be submitted:', JSON.stringify(formData, null, 2));
-    console.log('Using Supabase client from integrations/supabase/client.ts');
+    
+    // Add explicit authentication state logging
+    const { data: authData } = await supabase.auth.getSession();
+    console.log('Auth session check:', {
+      hasSession: !!authData.session,
+      isExpired: authData.session ? new Date(authData.session.expires_at * 1000) < new Date() : 'N/A',
+      role: authData.session ? 'authenticated' : 'anon'
+    });
+    
+    // Log request headers (from auth context)
+    console.log('Supabase client configuration:', {
+      persistSession: false,
+      autoRefreshToken: false,
+      usingAnonymousAuth: true
+    });
     
     // Log Supabase connection info for debugging
     console.log('Supabase connection check:', {
@@ -103,6 +117,13 @@ export const saveFormToSupabase = async (formData: any): Promise<{ success: bool
       console.error('Error message:', submissionError.message);
       console.error('Error code:', submissionError.code);
       console.error('Error details:', submissionError.details);
+      
+      // Log specific RLS error information
+      if (submissionError.code === '42501') {
+        console.error('RLS VIOLATION: This is likely a Row Level Security policy issue');
+        console.error('Check that the anon role has INSERT permission on submissions table');
+        console.error('Check that an appropriate RLS policy exists for anonymous inserts');
+      }
       
       return { 
         success: false, 
@@ -176,6 +197,13 @@ async function handleReelExamples(reelExamples: any[], submissionId: string): Pr
     console.error('Error message:', reelExamplesError.message);
     console.error('Error code:', reelExamplesError.code);
     console.error('Error details:', reelExamplesError.details);
+    
+    // Check for RLS violation in reel_examples table too
+    if (reelExamplesError.code === '42501') {
+      console.error('RLS VIOLATION: Row Level Security policy issue on reel_examples table');
+      console.error('Check that the anon role has INSERT permission on reel_examples table');
+      console.error('Check that an appropriate RLS policy exists for anonymous inserts');
+    }
     
     // We'll continue even if reel examples fail, since the main submission was successful
     // but we'll return information about the error
