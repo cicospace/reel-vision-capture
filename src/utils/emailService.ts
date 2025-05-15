@@ -45,8 +45,8 @@ export const clearStoredFormData = () => {
   }
 };
 
-// Function to save form data to Supabase
-export const saveFormToSupabase = async (formData: any): Promise<{ success: boolean, submissionId?: string }> => {
+// Updated function to save form data to Supabase with enhanced error handling
+export const saveFormToSupabase = async (formData: any): Promise<{ success: boolean, submissionId?: string, error?: {code: string, message: string, details?: any} }> => {
   try {
     console.log('Saving submission to Supabase...');
     console.log('Form data to be submitted:', JSON.stringify(formData, null, 2));
@@ -84,7 +84,7 @@ export const saveFormToSupabase = async (formData: any): Promise<{ success: bool
     
     console.log('Cleaned submission object:', JSON.stringify(submission, null, 2));
     
-    // First, insert the main submission - with detailed error logging
+    // Insert the main submission with comprehensive error logging
     console.log('Attempting to insert submission to Supabase...');
     const { data: submissionData, error: submissionError } = await supabase
       .from('submissions')
@@ -93,22 +93,40 @@ export const saveFormToSupabase = async (formData: any): Promise<{ success: bool
     
     if (submissionError) {
       console.error('Supabase submission error:', submissionError);
-      console.error('Error details:', submissionError.message);
+      console.error('Error message:', submissionError.message);
       console.error('Error code:', submissionError.code);
       console.error('Error details:', submissionError.details);
       console.error('Error hint:', submissionError.hint);
-      throw new Error(`Database error: ${submissionError.message}. Code: ${submissionError.code}`);
+      
+      // Return structured error info
+      return { 
+        success: false, 
+        error: {
+          code: submissionError.code,
+          message: submissionError.message,
+          details: {
+            hint: submissionError.hint,
+            details: submissionError.details
+          }
+        } 
+      };
     }
     
     if (!submissionData || submissionData.length === 0) {
       console.error('No submission data returned from Supabase');
-      throw new Error('No submission data returned');
+      return { 
+        success: false, 
+        error: {
+          code: 'NO_DATA_RETURNED',
+          message: 'No submission data returned from database'
+        } 
+      };
     }
     
     const submissionId = submissionData[0].id;
     console.log('Submission created with ID:', submissionId);
     
-    // Then, insert reel examples if they exist
+    // Insert reel examples if they exist
     if (formData.reelExamples && formData.reelExamples.length > 0) {
       console.log('Inserting reel examples:', formData.reelExamples.length);
       
@@ -125,11 +143,22 @@ export const saveFormToSupabase = async (formData: any): Promise<{ success: bool
       
       if (reelExamplesError) {
         console.error('Reel examples error:', reelExamplesError);
-        console.error('Error details:', reelExamplesError.message);
+        console.error('Error message:', reelExamplesError.message);
         console.error('Error code:', reelExamplesError.code);
         console.error('Error details:', reelExamplesError.details);
         console.error('Error hint:', reelExamplesError.hint);
+        
         // We'll continue even if reel examples fail, since the main submission was successful
+        // but we'll return information about the error
+        return { 
+          success: true, 
+          submissionId,
+          error: {
+            code: reelExamplesError.code,
+            message: 'Main submission succeeded but failed to save reel examples: ' + reelExamplesError.message,
+            details: reelExamplesError.details
+          }
+        };
       }
       
       console.log('Reel examples inserted successfully');
@@ -142,6 +171,15 @@ export const saveFormToSupabase = async (formData: any): Promise<{ success: bool
     if (error.code) {
       console.error('Error code:', error.code);
     }
-    return { success: false };
+    
+    // Return structured error info even for unexpected errors
+    return { 
+      success: false, 
+      error: {
+        code: error.code || 'UNKNOWN_ERROR',
+        message: error.message || 'An unknown error occurred',
+        details: error
+      }
+    };
   }
 };
