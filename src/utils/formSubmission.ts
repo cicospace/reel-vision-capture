@@ -43,11 +43,15 @@ export const saveFormToSupabase = async (formData: any): Promise<SubmissionRespo
       console.error('Error code:', submissionError.code);
       console.error('Error details:', submissionError.details);
       
-      // Log specific RLS error information
+      // Enhanced RLS error detection and logging
       if (submissionError.code === '42501') {
         console.error('RLS VIOLATION: This is likely a Row Level Security policy issue');
         console.error('Check that the anon role has INSERT permission on submissions table');
         console.error('Check that an appropriate RLS policy exists for anonymous inserts');
+        console.error('Suggested fix: Run the SQL provided to grant INSERT permission and create proper policies');
+      } else if (submissionError.code === 'PGRST301' || submissionError.message.includes('permission denied')) {
+        console.error('PERMISSION DENIED: The current role does not have permission to perform this action');
+        console.error('Ensure the anon role has been granted INSERT permission on the submissions table');
       }
       
       return { 
