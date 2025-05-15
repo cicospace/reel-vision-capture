@@ -1,8 +1,9 @@
+
 import { useState } from 'react';
 import { FormState } from './types';
 import { saveFormToSupabase } from "@/utils/formSubmission";
 import { toast } from "sonner";
-import { clearStoredFormData, loadFormFromStorage } from "@/utils/emailService";
+import { clearStoredFormData, loadFormFromStorage, saveFormToStorage } from "@/utils/formStorage";
 
 export const useFormSubmission = (
   formState: FormState,

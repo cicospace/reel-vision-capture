@@ -6,8 +6,8 @@ import { useFormNavigation } from './form/useFormNavigation';
 import { useFormSubmission } from './form/useFormSubmission';
 import { validateEmail, validatePhoneNumber } from './form/validation';
 
-export { FormState, initialFormState };
-export type { FormContextType, ReelExample } from './form/types';
+export { initialFormState };
+export type { FormContextType, FormState, ReelExample } from './form/types';
 
 export const FormContext = createContext<FormContextType>({
   formState: initialFormState,
