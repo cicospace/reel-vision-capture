@@ -18,7 +18,9 @@ const AuthWrapper = ({ children }: AuthWrapperProps) => {
       try {
         const { data, error } = await supabase.auth.getSession();
         
-        if (error) throw error;
+        if (error) {
+          throw error;
+        }
         
         if (data?.session) {
           setAuthenticated(true);
@@ -26,8 +28,16 @@ const AuthWrapper = ({ children }: AuthWrapperProps) => {
           navigate("/auth");
           toast.error("Please enter access code to view this page");
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Auth error:", error);
+        
+        // Special handling for email not confirmed error
+        if (error.message && error.message.includes("Email not confirmed")) {
+          toast.error("Email not confirmed", {
+            description: "Your account needs verification. Please try logging in again.",
+          });
+        }
+        
         navigate("/auth");
       } finally {
         setLoading(false);
@@ -43,6 +53,9 @@ const AuthWrapper = ({ children }: AuthWrapperProps) => {
         } else if (event === "SIGNED_OUT") {
           setAuthenticated(false);
           navigate("/auth");
+        } else if (event === "USER_UPDATED") {
+          // Handle user update events if needed
+          console.log("User updated event received");
         }
       }
     );

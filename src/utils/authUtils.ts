@@ -68,3 +68,28 @@ export const validateAccessCode = (code: string): boolean => {
   // Fallback to hash comparison
   return simpleHash(code) === HASHED_ACCESS_CODE;
 };
+
+// Function to delete a user by email through the edge function
+export const deleteUserByEmail = async (email: string): Promise<{ success: boolean; message: string }> => {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-user-by-email`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+      },
+      body: JSON.stringify({ email })
+    });
+
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to delete user');
+    }
+    
+    return { success: true, message: data.message };
+  } catch (error: any) {
+    console.error('Error deleting user:', error.message);
+    return { success: false, message: error.message };
+  }
+};

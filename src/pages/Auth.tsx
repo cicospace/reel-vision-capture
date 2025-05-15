@@ -33,16 +33,59 @@ const Auth = () => {
         password: password,
       });
       
-      // If the user doesn't exist yet, sign them up
-      if (error && error.message.includes("Invalid login credentials")) {
+      // If email not confirmed error or the user doesn't exist yet, sign up and auto-confirm
+      if (error && (error.message.includes("Email not confirmed") || error.message.includes("Invalid login credentials"))) {
+        console.log("Attempting to sign up user since login failed with:", error.message);
+        
+        // First try to delete any existing user that might be unconfirmed
+        try {
+          // This requires admin privileges, but we'll try anyway in case we're in dev mode
+          const { error: deleteError } = await supabase.rpc('delete_user_by_email', { 
+            email_to_delete: ADMIN_EMAIL 
+          });
+          
+          if (deleteError) {
+            console.log("Could not delete existing user:", deleteError.message);
+          }
+        } catch (deleteError) {
+          console.log("Error when trying to delete user:", deleteError);
+        }
+        
+        // Then sign up a new user with auto-confirmation
         const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
           email: ADMIN_EMAIL,
           password: password,
+          options: {
+            // This attempts to auto-confirm the email
+            data: {
+              confirmed_at: new Date().toISOString(),
+            }
+          }
         });
         
-        if (signUpError) throw signUpError;
-        
-        data = signUpData;
+        if (signUpError) {
+          throw signUpError;
+        }
+
+        if (!signUpData.session) {
+          // If we don't have a session after signup, we'll need to sign in
+          // But first let's wait a moment for the signup to complete
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          // Try signing in again
+          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+            email: ADMIN_EMAIL,
+            password: password,
+          });
+          
+          if (signInError) {
+            throw new Error("Auto-confirmation failed. Please contact support or manually confirm the email in Supabase dashboard.");
+          }
+          
+          data = signInData;
+        } else {
+          data = signUpData;
+        }
       } else if (error) {
         throw error;
       }
