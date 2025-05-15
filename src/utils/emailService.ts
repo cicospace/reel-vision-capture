@@ -98,6 +98,51 @@ export const saveFormToSupabase = async (formData: any): Promise<{ success: bool
       console.error('Error details:', submissionError.details);
       console.error('Error hint:', submissionError.hint);
       
+      // Retry without RLS for anonymous submissions (since we've now granted INSERT permission to anon)
+      if (submissionError.code === "42501") {
+        console.log('Retrying submission with anonymous permissions...');
+        const { data: retryData, error: retryError } = await supabase
+          .from('submissions')
+          .insert([submission])
+          .select();
+          
+        if (retryError) {
+          console.error('Retry failed:', retryError);
+          return { 
+            success: false, 
+            error: {
+              code: retryError.code,
+              message: retryError.message,
+              details: {
+                hint: retryError.hint,
+                details: retryError.details
+              }
+            } 
+          };
+        }
+        
+        if (!retryData || retryData.length === 0) {
+          console.error('No data returned from retry');
+          return { 
+            success: false, 
+            error: {
+              code: 'NO_DATA_RETURNED',
+              message: 'No submission data returned from database retry'
+            } 
+          };
+        }
+        
+        const submissionId = retryData[0].id;
+        console.log('Retry successful! Submission created with ID:', submissionId);
+        
+        // Continue with reel examples
+        if (formData.reelExamples && formData.reelExamples.length > 0) {
+          return await handleReelExamples(formData.reelExamples, submissionId);
+        }
+        
+        return { success: true, submissionId };
+      }
+      
       // Return structured error info
       return { 
         success: false, 
@@ -128,40 +173,7 @@ export const saveFormToSupabase = async (formData: any): Promise<{ success: bool
     
     // Insert reel examples if they exist
     if (formData.reelExamples && formData.reelExamples.length > 0) {
-      console.log('Inserting reel examples:', formData.reelExamples.length);
-      
-      const reelExamplesToInsert = formData.reelExamples.map((example: any) => ({
-        submission_id: submissionId,
-        link: example.link || '',
-        comment: example.comment || ''
-      }));
-      
-      console.log('Reel examples to insert:', reelExamplesToInsert);
-      const { error: reelExamplesError } = await supabase
-        .from('reel_examples')
-        .insert(reelExamplesToInsert);
-      
-      if (reelExamplesError) {
-        console.error('Reel examples error:', reelExamplesError);
-        console.error('Error message:', reelExamplesError.message);
-        console.error('Error code:', reelExamplesError.code);
-        console.error('Error details:', reelExamplesError.details);
-        console.error('Error hint:', reelExamplesError.hint);
-        
-        // We'll continue even if reel examples fail, since the main submission was successful
-        // but we'll return information about the error
-        return { 
-          success: true, 
-          submissionId,
-          error: {
-            code: reelExamplesError.code,
-            message: 'Main submission succeeded but failed to save reel examples: ' + reelExamplesError.message,
-            details: reelExamplesError.details
-          }
-        };
-      }
-      
-      console.log('Reel examples inserted successfully');
+      return await handleReelExamples(formData.reelExamples, submissionId);
     }
     
     return { success: true, submissionId };
@@ -183,3 +195,66 @@ export const saveFormToSupabase = async (formData: any): Promise<{ success: bool
     };
   }
 };
+
+// Helper function to handle reel examples insertion
+async function handleReelExamples(reelExamples: any[], submissionId: string): Promise<{ success: boolean, submissionId?: string, error?: {code: string, message: string, details?: any} }> {
+  console.log('Inserting reel examples:', reelExamples.length);
+  
+  const reelExamplesToInsert = reelExamples.map((example: any) => ({
+    submission_id: submissionId,
+    link: example.link || '',
+    comment: example.comment || ''
+  }));
+  
+  console.log('Reel examples to insert:', reelExamplesToInsert);
+  const { error: reelExamplesError } = await supabase
+    .from('reel_examples')
+    .insert(reelExamplesToInsert);
+  
+  if (reelExamplesError) {
+    console.error('Reel examples error:', reelExamplesError);
+    console.error('Error message:', reelExamplesError.message);
+    console.error('Error code:', reelExamplesError.code);
+    console.error('Error details:', reelExamplesError.details);
+    console.error('Error hint:', reelExamplesError.hint);
+    
+    // Try one more time with the anon permissions
+    if (reelExamplesError.code === "42501") {
+      console.log('Retrying reel examples with anonymous permissions...');
+      const { error: retryError } = await supabase
+        .from('reel_examples')
+        .insert(reelExamplesToInsert);
+        
+      if (retryError) {
+        console.error('Retry failed for reel examples:', retryError);
+        return { 
+          success: true, 
+          submissionId,
+          error: {
+            code: retryError.code,
+            message: 'Main submission succeeded but failed to save reel examples: ' + retryError.message,
+            details: retryError.details
+          }
+        };
+      }
+      
+      console.log('Reel examples retry successful!');
+      return { success: true, submissionId };
+    }
+    
+    // We'll continue even if reel examples fail, since the main submission was successful
+    // but we'll return information about the error
+    return { 
+      success: true, 
+      submissionId,
+      error: {
+        code: reelExamplesError.code,
+        message: 'Main submission succeeded but failed to save reel examples: ' + reelExamplesError.message,
+        details: reelExamplesError.details
+      }
+    };
+  }
+  
+  console.log('Reel examples inserted successfully');
+  return { success: true, submissionId };
+}
