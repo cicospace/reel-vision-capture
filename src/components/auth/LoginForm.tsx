@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
@@ -13,11 +12,15 @@ interface LoginFormProps {
 }
 
 const LoginForm = ({ onLoginSuccess }: LoginFormProps) => {
-  // Fix the TypeScript error by explicitly typing the state
   const [accessCode, setAccessCode] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Define a properly typed handler for the OTP input
+  const handleAccessCodeChange = (value: string) => {
+    setAccessCode(value);
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -117,11 +120,6 @@ const LoginForm = ({ onLoginSuccess }: LoginFormProps) => {
     }
   };
 
-  // Define a properly typed handler for the OTP input
-  const handleOTPChange = (value: string) => {
-    setAccessCode(value);
-  };
-
   return (
     <form onSubmit={handleLogin} className="space-y-4">
       <div className="space-y-2">
@@ -136,7 +134,7 @@ const LoginForm = ({ onLoginSuccess }: LoginFormProps) => {
             <InputOTP
               maxLength={20}
               value={accessCode}
-              onChange={handleOTPChange}
+              onChange={handleAccessCodeChange}
               pattern="^[A-Za-z0-9!@#$%^&*()_+-=[\]{}|;:,.<>/?]*$"
               inputMode="text"
               className="flex flex-wrap"
