@@ -1,87 +1,120 @@
 
 import * as React from "react"
-import { OTPInput, OTPInputContext } from "input-otp"
-import { Dot } from "lucide-react"
-
 import { cn } from "@/lib/utils"
 
-// Use Omit to properly override the onChange prop type from the original OTPInput component
-type InputOTPProps = Omit<React.ComponentPropsWithoutRef<typeof OTPInput>, 'onChange'> & {
+export interface InputOTPProps {
+  value: string;
   onChange: (value: string) => void;
-  value?: string;
-};
+  maxLength?: number;
+  className?: string;
+  containerClassName?: string;
+  inputMode?: "text" | "numeric" | "tel" | "search" | "email" | "url";
+  pattern?: string;
+  disabled?: boolean;
+}
 
 const InputOTP = React.forwardRef<
-  React.ElementRef<typeof OTPInput>,
+  HTMLDivElement,
   InputOTPProps
->(({ className, containerClassName, onChange, value, ...props }, ref) => {
-  // Create an adapter function that will convert the library's onChange callback
-  // to our string-based onChange
-  const handleChange = React.useCallback((val: any) => {
-    // Call our consumer's onChange with the string value
-    onChange(String(val));
-  }, [onChange]);
+>(({ 
+  value, 
+  onChange, 
+  maxLength = 6, 
+  className, 
+  containerClassName,
+  inputMode = "text",
+  pattern,
+  disabled = false
+}, ref) => {
+  const digits = value.split('');
   
+  // Handle input changes
+  const handleChange = (index: number, digit: string) => {
+    if (disabled) return;
+    
+    const newValue = [...digits];
+    newValue[index] = digit.slice(-1); // Only take the last character
+    
+    // Remove any undefined values
+    const filteredValue = newValue.filter(d => d !== undefined).join('');
+    onChange(filteredValue.slice(0, maxLength));
+  };
+
+  // Handle paste event
+  const handlePaste = (e: React.ClipboardEvent) => {
+    if (disabled) return;
+    
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData('text').slice(0, maxLength);
+    onChange(pastedData);
+  };
+
+  // Handle backspace and auto focus
+  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (disabled) return;
+    
+    // If backspace is pressed with empty input, focus previous input
+    if (e.key === 'Backspace' && !digits[index] && index > 0) {
+      // Focus previous input
+      const prevInput = document.getElementById(`otp-input-${index - 1}`);
+      prevInput?.focus();
+    }
+    
+    // If right arrow pressed, focus next input
+    if (e.key === 'ArrowRight' && index < maxLength - 1) {
+      const nextInput = document.getElementById(`otp-input-${index + 1}`);
+      nextInput?.focus();
+    }
+    
+    // If left arrow pressed, focus previous input
+    if (e.key === 'ArrowLeft' && index > 0) {
+      const prevInput = document.getElementById(`otp-input-${index - 1}`);
+      prevInput?.focus();
+    }
+  };
+
+  // Automatically focus the next input when a digit is entered
+  const handleDigitChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const digit = e.target.value;
+    handleChange(index, digit);
+    
+    // If digit is entered and we're not at the last input, focus next input
+    if (digit && index < maxLength - 1) {
+      const nextInput = document.getElementById(`otp-input-${index + 1}`);
+      nextInput?.focus();
+    }
+  };
+
   return (
-    <OTPInput
+    <div 
       ref={ref}
-      containerClassName={cn(
-        "flex items-center gap-2 has-[:disabled]:opacity-50",
-        containerClassName
-      )}
-      className={cn("disabled:cursor-not-allowed", className)}
-      onChange={handleChange}
-      value={value}
-      {...props}
-    />
-  )
-})
-InputOTP.displayName = "InputOTP"
-
-const InputOTPGroup = React.forwardRef<
-  React.ElementRef<"div">,
-  React.ComponentPropsWithoutRef<"div">
->(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("flex items-center", className)} {...props} />
-))
-InputOTPGroup.displayName = "InputOTPGroup"
-
-const InputOTPSlot = React.forwardRef<
-  React.ElementRef<"div">,
-  React.ComponentPropsWithoutRef<"div"> & { index: number }
->(({ index, className, ...props }, ref) => {
-  const inputOTPContext = React.useContext(OTPInputContext)
-  const { char, hasFakeCaret, isActive } = inputOTPContext.slots[index]
-
-  return (
-    <div
-      ref={ref}
-      className={cn(
-        "relative flex h-10 w-10 items-center justify-center border-y border-r border-input text-sm transition-all first:rounded-l-md first:border-l last:rounded-r-md",
-        isActive && "z-10 ring-2 ring-ring ring-offset-background",
-        className
-      )}
-      {...props}
+      className={cn("flex items-center gap-2", containerClassName)}
+      onPaste={handlePaste}
     >
-      {char}
-      {hasFakeCaret && (
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <div className="h-4 w-px animate-caret-blink bg-foreground duration-1000" />
-        </div>
-      )}
+      {Array.from({ length: maxLength }, (_, i) => (
+        <input
+          key={i}
+          id={`otp-input-${i}`}
+          type="text"
+          inputMode={inputMode}
+          pattern={pattern}
+          maxLength={1}
+          value={digits[i] || ''}
+          disabled={disabled}
+          className={cn(
+            "h-10 w-10 rounded border border-input bg-background text-center text-sm shadow-sm transition-all",
+            "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1",
+            disabled && "opacity-50 cursor-not-allowed",
+            className
+          )}
+          onChange={(e) => handleDigitChange(i, e)}
+          onKeyDown={(e) => handleKeyDown(i, e)}
+        />
+      ))}
     </div>
   )
 })
-InputOTPSlot.displayName = "InputOTPSlot"
 
-const InputOTPSeparator = React.forwardRef<
-  React.ElementRef<"div">,
-  React.ComponentPropsWithoutRef<"div">
->(({ ...props }, ref) => (
-  <div ref={ref} role="separator" {...props}>
-    <Dot />
-  </div>
-))
-InputOTPSeparator.displayName = "InputOTPSeparator"
+InputOTP.displayName = "InputOTP"
 
-export { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator }
+export { InputOTP }

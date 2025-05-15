@@ -1,6 +1,7 @@
+
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { InputOTP } from "@/components/ui/input-otp";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
@@ -16,11 +17,6 @@ const LoginForm = ({ onLoginSuccess }: LoginFormProps) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-
-  // Define a properly typed handler for the OTP input
-  const handleAccessCodeChange = (value: string) => {
-    setAccessCode(value);
-  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -134,17 +130,11 @@ const LoginForm = ({ onLoginSuccess }: LoginFormProps) => {
             <InputOTP
               maxLength={20}
               value={accessCode}
-              onChange={handleAccessCodeChange}
-              pattern="^[A-Za-z0-9!@#$%^&*()_+-=[\]{}|;:,.<>/?]*$"
+              onChange={setAccessCode}
+              pattern="[A-Za-z0-9!@#$%^&*()_+\\-=\\[\\]{}|;:,.<>/?]+"
               inputMode="text"
-              className="flex flex-wrap"
-            >
-              <InputOTPGroup className="flex flex-wrap gap-1 justify-center">
-                {Array.from({ length: 20 }, (_, i) => (
-                  <InputOTPSlot key={i} index={i} className="w-8 h-9 text-xs" />
-                ))}
-              </InputOTPGroup>
-            </InputOTP>
+              className="w-8 h-9 text-xs"
+            />
           </div>
         </div>
       </div>
