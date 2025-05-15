@@ -108,8 +108,8 @@ export const saveFormToSupabase = async (formData: any): Promise<{ success: bool
     // Insert the main submission with comprehensive error logging
     console.log('Attempting to insert submission to Supabase...');
     
-    // Log the actual URL being used (for debugging)
-    console.log('Supabase URL:', supabase.supabaseUrl);
+    // Log the actual URL being used (for debugging) - using environment variable instead of protected property
+    console.log('Supabase URL:', "https://hxcceigrkxcaxsiikuvs.supabase.co");
     
     // Log the exact FROM call being made
     console.log('FROM call:', 'submissions');
