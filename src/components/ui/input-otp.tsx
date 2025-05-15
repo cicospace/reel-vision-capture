@@ -6,13 +6,13 @@ import { Dot } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 type InputOTPProps = React.ComponentPropsWithoutRef<typeof OTPInput> & {
-  onChange?: (value: string) => void;
+  onChange: (value: string) => void;
 };
 
 const InputOTP = React.forwardRef<
   React.ElementRef<typeof OTPInput>,
   InputOTPProps
->(({ className, containerClassName, ...props }, ref) => (
+>(({ className, containerClassName, onChange, ...props }, ref) => (
   <OTPInput
     ref={ref}
     containerClassName={cn(
@@ -20,6 +20,7 @@ const InputOTP = React.forwardRef<
       containerClassName
     )}
     className={cn("disabled:cursor-not-allowed", className)}
+    onChange={onChange}
     {...props}
   />
 ))
