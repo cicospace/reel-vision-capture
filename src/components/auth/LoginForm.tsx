@@ -116,7 +116,7 @@ const LoginForm = ({ onLoginSuccess }: LoginFormProps) => {
     }
   };
 
-  // Fix for the TypeScript error by using type assertion for the onChange handler
+  // Fix the TypeScript error by using the correct type assertion for the InputOTP component
   const handleOTPChange = (value: string) => {
     setAccessCode(value);
   };
@@ -135,7 +135,7 @@ const LoginForm = ({ onLoginSuccess }: LoginFormProps) => {
             <InputOTP
               maxLength={20}
               value={accessCode}
-              onChange={handleOTPChange as any}
+              onChange={handleOTPChange as unknown as (val: never) => void}
               pattern="^[A-Za-z0-9!@#$%^&*()_+-=[\]{}|;:,.<>/?]*$"
               inputMode="text"
               className="flex flex-wrap"
