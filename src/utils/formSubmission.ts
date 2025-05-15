@@ -27,11 +27,24 @@ export const saveFormToSupabase = async (formData: any): Promise<SubmissionRespo
     const submission = prepareSubmissionData(formData);
     console.log('Cleaned submission object:', JSON.stringify(submission, null, 2));
     
-    // Insert the main submission
+    // Get session information directly before submission attempt
+    const { data: sessionData } = await supabase.auth.getSession();
+    console.log('Auth session before submission:', {
+      hasSession: !!sessionData.session,
+      role: sessionData.session ? 'authenticated' : 'anon',
+      expiresAt: sessionData.session ? new Date(sessionData.session.expires_at * 1000).toISOString() : 'N/A'
+    });
+    
+    // Log request details that will be used
     console.log('Attempting to insert submission to Supabase...');
     console.log('Supabase URL:', "https://hxcceigrkxcaxsiikuvs.supabase.co");
     console.log('FROM call:', 'submissions');
+    console.log('Client config:', {
+      persistSession: false,
+      autoRefreshToken: false
+    });
     
+    // Insert the main submission with proper await and error checking
     const { data: submissionData, error: submissionError } = await supabase
       .from('submissions')
       .insert([submission])
@@ -66,6 +79,9 @@ export const saveFormToSupabase = async (formData: any): Promise<SubmissionRespo
         } 
       };
     }
+    
+    // Log successful insert data
+    console.log('Insert success:', submissionData);
     
     if (!submissionData || submissionData.length === 0) {
       console.error('No submission data returned from Supabase');
@@ -116,9 +132,19 @@ async function handleReelExamples(reelExamples: any[], submissionId: string): Pr
   }));
   
   console.log('Reel examples to insert:', reelExamplesToInsert);
-  const { error: reelExamplesError } = await supabase
+  
+  // Get session information directly before reel examples submission
+  const { data: sessionData } = await supabase.auth.getSession();
+  console.log('Auth session before reel examples insert:', {
+    hasSession: !!sessionData.session,
+    role: sessionData.session ? 'authenticated' : 'anon'
+  });
+  
+  const { data: reelData, error: reelExamplesError } = await supabase
     .from('reel_examples')
     .insert(reelExamplesToInsert);
+  
+  console.log('Reel examples insert result:', reelData || 'No data returned');
   
   if (reelExamplesError) {
     console.error('Reel examples error:', reelExamplesError);
