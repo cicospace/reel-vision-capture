@@ -3,7 +3,7 @@ import React from "react";
 
 type InputOTPProps = {
   value: string;
-  onChange: (value: string) => void;
+  onChange: (val: string) => void;
 };
 
 const InputOTP: React.FC<InputOTPProps> = ({ value, onChange }) => {
