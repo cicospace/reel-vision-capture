@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { InputOTP } from "@/components/ui/input-otp";
@@ -125,17 +124,8 @@ const LoginForm = ({ onLoginSuccess }: LoginFormProps) => {
         <p className="text-center text-muted-foreground mb-4">
           Enter the secure access code to continue
         </p>
-        <div className="flex justify-center mb-4 overflow-x-auto pb-2">
-          <div className="max-w-full">
-            <InputOTP
-              maxLength={20}
-              value={accessCode}
-              onChange={setAccessCode}
-              pattern="[A-Za-z0-9!@#$%^&*()_+\\-=\\[\\]{}|;:,.<>/?]+"
-              inputMode="text"
-              className="w-8 h-9 text-xs"
-            />
-          </div>
+        <div className="flex justify-center mb-4">
+          <InputOTP value={accessCode} onChange={setAccessCode} />
         </div>
       </div>
       
