@@ -163,7 +163,7 @@ const Auth = () => {
                 <InputOTP
                   maxLength={20}
                   value={accessCode}
-                  onChange={(value: string) => setAccessCode(value)}
+                  onChange={setAccessCode}
                   pattern="^[A-Za-z0-9!@#$%^&*()_+-=[\]{}|;:,.<>/?]*$"
                   inputMode="text"
                   className="flex flex-wrap"
