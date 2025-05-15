@@ -50,6 +50,7 @@ export const saveFormToSupabase = async (formData: any): Promise<{ success: bool
   try {
     console.log('Saving submission to Supabase...');
     console.log('Form data to be submitted:', JSON.stringify(formData, null, 2));
+    console.log('Supabase URL being used:', supabase.supabaseUrl);
     
     // Ensure arrays are proper arrays and not empty
     const tones = Array.isArray(formData.tones) ? formData.tones : [];
