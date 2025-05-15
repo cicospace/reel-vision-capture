@@ -126,7 +126,10 @@ const LoginForm = ({ onLoginSuccess }: LoginFormProps) => {
           Enter the secure access code to continue
         </p>
         <div className="flex justify-center mb-4">
-          <InputOTP value={accessCode} onChange={(value: string) => setAccessCode(value)} />
+          <InputOTP 
+            value={accessCode} 
+            onChange={(value) => setAccessCode(value)} 
+          />
         </div>
       </div>
       
