@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
@@ -117,7 +116,7 @@ const LoginForm = ({ onLoginSuccess }: LoginFormProps) => {
     }
   };
 
-  // Fix for the TypeScript error by ensuring the onChange handler has the correct type signature
+  // Fix for the TypeScript error by using type assertion for the onChange handler
   const handleOTPChange = (value: string) => {
     setAccessCode(value);
   };
@@ -136,7 +135,7 @@ const LoginForm = ({ onLoginSuccess }: LoginFormProps) => {
             <InputOTP
               maxLength={20}
               value={accessCode}
-              onChange={handleOTPChange}
+              onChange={handleOTPChange as any}
               pattern="^[A-Za-z0-9!@#$%^&*()_+-=[\]{}|;:,.<>/?]*$"
               inputMode="text"
               className="flex flex-wrap"
