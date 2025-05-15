@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
@@ -116,7 +117,7 @@ const LoginForm = ({ onLoginSuccess }: LoginFormProps) => {
     }
   };
 
-  // Fix the TypeScript error by using the correct type assertion for the InputOTP component
+  // Define a properly typed handler for the OTP input
   const handleOTPChange = (value: string) => {
     setAccessCode(value);
   };
