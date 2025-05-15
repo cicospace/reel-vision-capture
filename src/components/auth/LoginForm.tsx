@@ -117,6 +117,11 @@ const LoginForm = ({ onLoginSuccess }: LoginFormProps) => {
     }
   };
 
+  // Fix for the TypeScript error by ensuring the onChange handler has the correct type signature
+  const handleOTPChange = (value: string) => {
+    setAccessCode(value);
+  };
+
   return (
     <form onSubmit={handleLogin} className="space-y-4">
       <div className="space-y-2">
@@ -131,7 +136,7 @@ const LoginForm = ({ onLoginSuccess }: LoginFormProps) => {
             <InputOTP
               maxLength={20}
               value={accessCode}
-              onChange={(value: string) => setAccessCode(value)}
+              onChange={handleOTPChange}
               pattern="^[A-Za-z0-9!@#$%^&*()_+-=[\]{}|;:,.<>/?]*$"
               inputMode="text"
               className="flex flex-wrap"
