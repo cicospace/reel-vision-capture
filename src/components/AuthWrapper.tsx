@@ -1,7 +1,9 @@
+
 import { useEffect, useState, ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { setAuthenticatedState, clearAuthenticatedState } from "@/utils/authUtils";
 
 interface AuthWrapperProps {
   children: ReactNode;
@@ -14,60 +16,63 @@ const AuthWrapper = ({ children }: AuthWrapperProps) => {
   const location = useLocation();
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        // First set up the auth listener to avoid race conditions
-        const { data: authListener } = supabase.auth.onAuthStateChange(
-          (event, session) => {
-            console.log("Auth state change:", event);
-            if (event === "SIGNED_IN" && session) {
-              setAuthenticated(true);
-            } else if (event === "SIGNED_OUT") {
-              setAuthenticated(false);
-              if (location.pathname !== "/auth") {
-                navigate("/auth");
-              }
-            }
-          }
-        );
+    // First check if there's an existing session directly
+    supabase.auth.getSession().then(({ data, error }) => {
+      if (error) {
+        console.error("Session check error:", error);
+      }
+      
+      // Update authenticated state based on session
+      if (data.session) {
+        setAuthenticated(true);
+        setAuthenticatedState(); // Update local storage as well
+      } else {
+        setAuthenticated(false);
+        clearAuthenticatedState();
         
-        // Then check for an existing session
-        const { data, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          throw error;
-        }
-        
-        if (data?.session) {
-          setAuthenticated(true);
-        } else {
-          if (location.pathname !== "/auth") {
-            navigate("/auth");
-            toast.error("Please enter access code to view this page");
-          }
-        }
-      } catch (error: any) {
-        console.error("Auth error:", error);
-        
-        // Special handling for email not confirmed error
-        if (error.message && error.message.includes("Email not confirmed")) {
-          toast.error("Email not confirmed", {
-            description: "Your account needs verification. Please try logging in again.",
+        // Only redirect if not already on auth page
+        if (location.pathname !== "/auth") {
+          navigate("/auth", { 
+            state: { from: location.pathname }, 
+            replace: true 
           });
         }
-        
-        if (location.pathname !== "/auth") {
-          navigate("/auth");
-        }
-      } finally {
-        setLoading(false);
       }
-    };
-
-    checkAuth();
-
+      
+      setLoading(false);
+    });
+    
+    // Then set up auth listener for future changes
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth state change:", event);
+      
+      if (event === "SIGNED_IN" && session) {
+        setAuthenticated(true);
+        setAuthenticatedState();
+        
+        // If on auth page, redirect to intended destination
+        if (location.pathname === "/auth") {
+          const redirectTo = location.state?.from || "/admin";
+          navigate(redirectTo, { replace: true });
+        }
+      } 
+      else if (event === "SIGNED_OUT") {
+        setAuthenticated(false);
+        clearAuthenticatedState();
+        
+        // If not on auth page, redirect to auth
+        if (location.pathname !== "/auth") {
+          navigate("/auth", { 
+            state: { from: location.pathname },
+            replace: true 
+          });
+        }
+      }
+    });
+    
+    // Clean up listener on component unmount
     return () => {
-      // The subscription cleanup is handled inside the checkAuth function
+      authListener.subscription.unsubscribe();
     };
   }, [navigate, location.pathname]);
 
@@ -79,13 +84,14 @@ const AuthWrapper = ({ children }: AuthWrapperProps) => {
     );
   }
 
+  // For the auth page specifically, show it regardless of auth status
+  if (location.pathname === "/auth") {
+    return <>{children}</>;
+  }
+
+  // For other protected pages, only show if authenticated
   if (!authenticated) {
-    // If we're on the auth page and not authenticated, render the auth page
-    if (location.pathname === "/auth") {
-      return <>{children}</>;
-    }
-    // Otherwise, return null so the router can redirect
-    return null;
+    return null; // Return null so the router can handle the redirection
   }
 
   return <>{children}</>;

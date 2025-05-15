@@ -1,10 +1,10 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { KeyRound } from "lucide-react";
 import { validateAccessCode, ADMIN_EMAIL, setAuthenticatedState } from "@/utils/authUtils";
@@ -12,7 +12,28 @@ import { validateAccessCode, ADMIN_EMAIL, setAuthenticatedState } from "@/utils/
 const Auth = () => {
   const [accessCode, setAccessCode] = useState<string>("");
   const [loading, setLoading] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Check if user is already authenticated on component mount
+  useEffect(() => {
+    const checkExistingAuth = async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (data.session) {
+          const from = location.state?.from || "/admin";
+          navigate(from, { replace: true });
+        }
+      } catch (error) {
+        console.error("Auth check error:", error);
+      } finally {
+        setAuthChecked(true);
+      }
+    };
+    
+    checkExistingAuth();
+  }, [navigate, location.state]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,7 +115,10 @@ const Auth = () => {
       setAuthenticatedState();
       
       toast.success("Access granted");
-      navigate("/admin");
+
+      // Check if we have a redirect path from location state
+      const redirectTo = location.state?.from || "/admin";
+      navigate(redirectTo, { replace: true });
     } catch (error: any) {
       toast.error("Access denied", {
         description: error.message || "Please check your access code and try again"
@@ -104,6 +128,15 @@ const Auth = () => {
       setLoading(false);
     }
   };
+
+  if (!authChecked) {
+    // Show loading state while checking auth
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
