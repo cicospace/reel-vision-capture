@@ -1,5 +1,6 @@
+
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,6 +21,7 @@ const Admin = () => {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     // Check authentication
@@ -145,13 +147,13 @@ const Admin = () => {
                           {new Date(submission.created_at).toLocaleDateString()}
                         </td>
                         <td className="py-3 px-4">
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            onClick={() => navigate(`/submission/${submission.id}`)}
+                          <Link 
+                            to={`/submission/${submission.id}`}
+                            state={{ from: location.pathname }}
+                            className="inline-flex h-8 items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-secondary hover:text-secondary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-primary"
                           >
                             View
-                          </Button>
+                          </Link>
                         </td>
                       </tr>
                     ))}

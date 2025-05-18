@@ -9,8 +9,7 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const [authChecked, setAuthChecked] = useState(false);
-  const [authenticated, setAuthenticated] = useState(false);
+  const [session, setSession] = useState<any>(undefined);
   const location = useLocation();
 
   useEffect(() => {
@@ -22,9 +21,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
           (event, session) => {
             console.log("ProtectedRoute: Auth state change event:", event);
-            const isAuthed = !!session;
-            setAuthenticated(isAuthed);
-            setAuthChecked(true);
+            setSession(session);
           }
         );
         
@@ -33,13 +30,10 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
         
         if (error) {
           console.error("ProtectedRoute auth error:", error);
-          setAuthenticated(false);
-          setAuthChecked(true);
+          setSession(null);
         } else {
-          const isAuthed = !!data.session;
-          console.log("ProtectedRoute: Session check result:", isAuthed ? "authenticated" : "not authenticated");
-          setAuthenticated(isAuthed);
-          setAuthChecked(true);
+          console.log("ProtectedRoute: Session check result:", data.session ? "authenticated" : "not authenticated");
+          setSession(data.session);
         }
 
         return () => {
@@ -47,15 +41,15 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
         };
       } catch (error) {
         console.error("ProtectedRoute unexpected error:", error);
-        setAuthenticated(false);
-        setAuthChecked(true);
+        setSession(null);
       }
     };
 
     checkAuth();
   }, [location.pathname]);
 
-  if (!authChecked) {
+  // Still checking with Supabase
+  if (session === undefined) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <LoadingSpinner size="lg" />
@@ -63,9 +57,9 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     );
   }
 
-  if (!authenticated) {
+  // No session → send to auth, preserving where we were
+  if (!session) {
     console.log("ProtectedRoute: Not authenticated, redirecting to /auth with state:", { from: location.pathname + location.search });
-    // Store the current location to redirect back after login
     return <Navigate to="/auth" state={{ from: location.pathname + location.search }} replace />;
   }
 
