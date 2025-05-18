@@ -1,117 +1,70 @@
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import SimpleOtp from "@/components/ui/SimpleOtp";
-import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useLocation } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { KeyRound } from "lucide-react";
-import {
-  validateAccessCode,
-  ADMIN_EMAIL,
-  setAuthenticatedState,
-} from "@/utils/authUtils";
+import { Button } from "@/components/ui/button";
+import { ADMIN_EMAIL, validateAccessCode, setAuthenticatedState } from "@/utils/authUtils";
 
-interface LoginFormProps {
-  onLoginSuccess?: () => void;
-}
-
-export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
-  const [accessCode, setAccessCode] = useState<string>("");
+export default function LoginForm() {
+  const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validateAccessCode(code)) {
+      return toast.error("Invalid code");
+    }
     setLoading(true);
+    const password = `${code}_supabase`;
 
     try {
-      if (!validateAccessCode(accessCode)) {
-        throw new Error("Invalid access code");
-      }
-
-      const password = `${accessCode}_supabase`;
-
       let { data, error } = await supabase.auth.signInWithPassword({
         email: ADMIN_EMAIL,
         password,
       });
 
-      if (
-        error &&
-        (error.message.includes("Email not confirmed") ||
-          error.message.includes("Invalid login credentials"))
-      ) {
-        {
-          const { error: deleteError } = await supabase.rpc(
-            "delete_user_by_email",
-            { email_to_delete: ADMIN_EMAIL }
-          );
-          if (deleteError) {
-            console.log("Could not delete existing user:", deleteError.message);
-          }
-        }
-
-        const { data: suData, error: suError } = await supabase.auth.signUp({
+      if (error?.message.includes("Invalid login credentials")) {
+        // auto-signup flow
+        await supabase.rpc("delete_user_by_email", { email_to_delete: ADMIN_EMAIL });
+        const { data: suData, error: suErr } = await supabase.auth.signUp({
           email: ADMIN_EMAIL,
           password,
           options: { data: { confirmed_at: new Date().toISOString() } },
         });
-        if (suError) throw suError;
-
-        if (!suData.session) {
-          await new Promise((r) => setTimeout(r, 1000));
-          const { data: siData, error: siError } =
-            await supabase.auth.signInWithPassword({
-              email: ADMIN_EMAIL,
-              password,
-            });
-          if (siError) throw siError;
-          data = siData;
-        } else {
-          data = suData;
-        }
-      } else if (error) {
-        throw error;
+        if (suErr) throw suErr;
+        data = suData.session
+          ? suData
+          : (await supabase.auth.signInWithPassword({ email: ADMIN_EMAIL, password })).data;
       }
 
+      if (!data?.session) throw new Error("Authentication failed");
+
       setAuthenticatedState();
-      toast.success("Access granted");
-
-      onLoginSuccess?.();
-
-      const redirectTo = (location.state as any)?.from || "/admin";
-      navigate(redirectTo, { replace: true });
+      toast.success("Welcome back!");
+      const dest = (location.state as any)?.from || "/admin";
+      navigate(dest, { replace: true });
     } catch (err: any) {
-      toast.error("Access denied", {
-        description: err.message || "Please check your access code",
-      });
       console.error(err);
+      toast.error("Access denied", { description: err.message });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleLogin} className="space-y-6 max-w-md mx-auto">
-      <div className="text-center">
-        <KeyRound className="mx-auto mb-4 h-8 w-8 text-primary" />
-        <p className="text-muted-foreground">
-          Enter the secure access code to continue
-        </p>
-      </div>
-
-      <div className="flex justify-center">
-        <SimpleOtp value={accessCode} onChange={setAccessCode} />
-      </div>
-
-      <Button
-        type="submit"
-        className="w-full bg-primary text-primary-foreground"
-        disabled={loading}
-      >
-        {loading ? "Verifying…" : "Access Admin Dashboard"}
+    <form onSubmit={handleSubmit} className="max-w-sm mx-auto space-y-4">
+      <input
+        type="text"
+        value={code}
+        onChange={e => setCode(e.target.value)}
+        placeholder="Enter access code"
+        className="w-full border rounded px-3 py-2 bg-background text-foreground"
+      />
+      <Button type="submit" className="w-full" disabled={loading}>
+        {loading ? "Verifying…" : "Enter Dashboard"}
       </Button>
     </form>
   );
