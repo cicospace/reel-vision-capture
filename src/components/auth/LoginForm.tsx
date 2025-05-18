@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import SimpleOtp from "@/components/ui/SimpleOtp";
@@ -42,10 +43,9 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
         (error.message.includes("Email not confirmed") ||
           error.message.includes("Invalid login credentials"))
       ) {
-        // Attempt signup + auto-confirm
         {
           const { error: deleteError } = await supabase.rpc(
-            'delete_user_by_email',
+            "delete_user_by_email",
             { email_to_delete: ADMIN_EMAIL }
           );
           if (deleteError) {
@@ -81,7 +81,7 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
 
       onLoginSuccess?.();
 
-      const redirectTo = location.state && (location.state as { from?: string }).from || "/admin";
+      const redirectTo = (location.state as any)?.from || "/admin";
       navigate(redirectTo, { replace: true });
     } catch (err: any) {
       toast.error("Access denied", {
@@ -103,10 +103,7 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
       </div>
 
       <div className="flex justify-center">
-        <SimpleOtp 
-          value={accessCode} 
-          onChange={setAccessCode} 
-        />
+        <SimpleOtp value={accessCode} onChange={setAccessCode} />
       </div>
 
       <Button

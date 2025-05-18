@@ -1,4 +1,4 @@
-// src/components/ui/SimpleOtp.tsx
+
 import React, { useRef } from "react";
 
 interface SimpleOtpProps {
@@ -15,14 +15,7 @@ export default function SimpleOtp({
   onChange,
   length = 6,
 }: SimpleOtpProps) {
-  // Your existing implementation here,
-  // but make sure you only call onChange(...) with a string.
-  // e.g. onChange(updatedString);
-
-  // Example skeleton:
   const inputs = useRef<HTMLInputElement[]>([]);
-  // … render `length` inputs, each wired to update the correct digit
-  // when any input changes, do: onChange(newFullValue);
   return (
     <div className="flex space-x-2">
       {Array.from({ length }).map((_, i) => (
