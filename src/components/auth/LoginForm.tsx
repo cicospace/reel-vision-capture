@@ -29,7 +29,7 @@ export default function LoginForm() {
 
       if (error?.message.includes("Invalid login credentials")) {
         // auto-signup flow
-        // Properly type the RPC parameter as Record<string, any>
+        // Define the parameter with the correct type
         const params: Record<string, any> = { email_to_delete: ADMIN_EMAIL };
         const { error: deleteError } = await supabase.rpc("delete_user_by_email", params);
         
