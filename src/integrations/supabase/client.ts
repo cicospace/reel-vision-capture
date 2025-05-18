@@ -6,12 +6,9 @@ import type { Database } from './types';
 const SUPABASE_URL = "https://hxcceigrkxcaxsiikuvs.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4Y2NlaWdya3hjYXhzaWlrdXZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcwNjcxNzcsImV4cCI6MjA2MjY0MzE3N30.UBLIXXjHIoOMS0p6-Wyd0wvAAlNKFaAt-vMuiuVdm3Y";
 
-// Import the supabase client like this:
-// import { supabase } from "@/integrations/supabase/client";
-
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
-    persistSession: true,  // Changed from false to true
-    autoRefreshToken: true // Changed from false to true
+    persistSession: true,
+    autoRefreshToken: true
   }
 });

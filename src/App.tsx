@@ -2,14 +2,14 @@
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect } from "react";
 import Index from "./pages/Index";
 import Admin from "./pages/Admin";
 import Auth from "./pages/Auth";
 import SubmissionDetail from "./pages/SubmissionDetail";
 import NotFound from "./pages/NotFound";
-import ProtectedRoute from "./components/ProtectedRoute";
+import { isAuthenticated } from "./utils/authUtils";
 
 // Create a new QueryClient instance with retry configuration
 const queryClient = new QueryClient({
@@ -20,6 +20,11 @@ const queryClient = new QueryClient({
     }
   }
 });
+
+// Protected route component
+const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
+  return isAuthenticated() ? children : <Navigate to="/auth" replace />;
+};
 
 const App = () => {
   // Force dark mode
