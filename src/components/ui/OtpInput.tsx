@@ -1,18 +1,18 @@
 
-// src/components/ui/input-otp.tsx
+// src/components/ui/OtpInput.tsx
 import React, { useRef } from 'react';
 
-export interface InputOTPProps {
+export interface OtpInputProps {
   value: string;
   onChange: (newValue: string) => void;
   length?: number;
 }
 
-export default function InputOTP({
+export default function OtpInput({
   value,
   onChange,
   length = 6,
-}: InputOTPProps) {
+}: OtpInputProps) {
   const inputs = useRef<Array<HTMLInputElement | null>>([]);
 
   // build array of exactly `length` characters

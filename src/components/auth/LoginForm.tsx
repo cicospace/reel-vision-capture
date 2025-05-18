@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import InputOTP from "../ui/input-otp";
+import OtpInput from "@/components/ui/OtpInput";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
@@ -126,7 +126,7 @@ const LoginForm = ({ onLoginSuccess }: LoginFormProps) => {
           Enter the secure access code to continue
         </p>
         <div className="flex justify-center mb-4">
-          <InputOTP 
+          <OtpInput 
             value={accessCode} 
             onChange={setAccessCode} 
             length={6}
