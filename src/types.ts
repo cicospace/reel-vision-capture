@@ -33,3 +33,13 @@ export interface Submission {
   created_at?: string;
   updated_at?: string;
 }
+
+export interface SubmissionResponse {
+  success: boolean;
+  submissionId?: string;
+  error?: {
+    code: string;
+    message: string;
+    details?: any;
+  };
+}

@@ -1,9 +1,8 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { logAuthState, logSupabaseConnection } from "../loggingUtils";
 import { prepareSubmissionData } from "./submissionDataFormatter";
 import { handleReelExamples } from "./reelExamplesService";
-import { SubmissionResponse } from "../types";
+import { SubmissionResponse, Submission } from "../types";
 
 // Main function to save form data to Supabase
 export const saveFormToSupabase = async (formData: any): Promise<SubmissionResponse> => {
@@ -67,7 +66,7 @@ export const saveFormToSupabase = async (formData: any): Promise<SubmissionRespo
     // Insert the main submission with proper await and error checking
     const { data: submissionData, error: submissionError } = await supabase
       .from('submissions')
-      .insert([submission])
+      .insert([submission as Submission])
       .select();
     
     if (submissionError) {

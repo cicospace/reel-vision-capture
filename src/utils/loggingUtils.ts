@@ -32,3 +32,12 @@ export const logAuthState = async () => {
 export const logNavigation = (from: string, to: string, params?: Record<string, any>) => {
   console.log(`Navigation: ${from} → ${to}`, params || {});
 };
+
+// Add the missing logSupabaseConnection function
+export const logSupabaseConnection = () => {
+  console.log('Supabase connection info:', {
+    url: 'https://hxcceigrkxcaxsiikuvs.supabase.co',
+    connected: !!supabase,
+    timestamp: new Date().toISOString()
+  });
+};
