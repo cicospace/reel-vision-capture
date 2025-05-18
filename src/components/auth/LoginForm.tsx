@@ -20,7 +20,7 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
   const [accessCode, setAccessCode] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation<{ from?: string }>();
+  const location = useLocation();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,9 +44,15 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
           error.message.includes("Invalid login credentials"))
       ) {
         // Attempt signup + auto-confirm
-        await supabase.rpc("delete_user_by_email", {
-          email_to_delete: ADMIN_EMAIL,
-        }).catch(() => { /* ignore */ });
+        {
+          const { error: deleteError } = await supabase.rpc(
+            'delete_user_by_email',
+            { email_to_delete: ADMIN_EMAIL }
+          );
+          if (deleteError) {
+            console.log("Could not delete existing user:", deleteError.message);
+          }
+        }
 
         const { data: suData, error: suError } = await supabase.auth.signUp({
           email: ADMIN_EMAIL,
@@ -76,7 +82,7 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
 
       onLoginSuccess?.();
 
-      const redirectTo = location.state?.from || "/admin";
+      const redirectTo = (location.state as { from?: string })?.from || "/admin";
       navigate(redirectTo, { replace: true });
     } catch (err: any) {
       toast.error("Access denied", {
