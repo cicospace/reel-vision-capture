@@ -1,10 +1,10 @@
 
 import React from "react";
 
-type InputOTPProps = {
+interface InputOTPProps {
   value: string;
-  onChange: (val: string) => void;
-};
+  onChange: (value: string) => void;
+}
 
 const InputOTP: React.FC<InputOTPProps> = ({ value, onChange }) => {
   return (
@@ -12,7 +12,9 @@ const InputOTP: React.FC<InputOTPProps> = ({ value, onChange }) => {
       type="text"
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="otp-input"
+      className="otp-input px-4 py-2 border border-gray-300 rounded text-center w-24 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+      placeholder="Access code"
+      autoComplete="off"
     />
   );
 };
