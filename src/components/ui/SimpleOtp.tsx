@@ -1,9 +1,12 @@
-
-import { useRef, useEffect } from "react";
+// src/components/ui/SimpleOtp.tsx
+import React, { useRef } from "react";
 
 interface SimpleOtpProps {
+  /** The full OTP string */
   value: string;
+  /** Called whenever value changes — will receive the new full string */
   onChange: (newValue: string) => void;
+  /** Number of boxes (optional, defaults to 6) */
   length?: number;
 }
 
@@ -12,54 +15,31 @@ export default function SimpleOtp({
   onChange,
   length = 6,
 }: SimpleOtpProps) {
-  const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
+  // Your existing implementation here,
+  // but make sure you only call onChange(...) with a string.
+  // e.g. onChange(updatedString);
 
-  // Ensure the internal value always matches the desired length
-  const padded = value.padEnd(length, " ").slice(0, length);
-
-  useEffect(() => {
-    // Focus next empty input on mount/update
-    const idx = padded.indexOf(" ");
-    if (idx >= 0 && inputsRef.current[idx]) {
-      inputsRef.current[idx]!.focus();
-    }
-  }, [padded]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>, idx: number) => {
-    const char = e.target.value.replace(/\D/g, "").slice(-1);
-    const arr = padded.split("");
-    arr[idx] = char || " ";
-    onChange(arr.join("").trimEnd());
-    if (char && idx < length - 1) {
-      inputsRef.current[idx + 1]?.focus();
-    }
-  };
-
-  const handleKey = (e: React.KeyboardEvent, idx: number) => {
-    if (e.key === "Backspace" && !padded[idx] && idx > 0) {
-      inputsRef.current[idx - 1]?.focus();
-    }
-  };
-
-  const handlePaste = (e: React.ClipboardEvent) => {
-    const pasted = e.clipboardData.getData("Text").replace(/\D/g, "");
-    onChange(pasted.slice(0, length));
-  };
-
+  // Example skeleton:
+  const inputs = useRef<HTMLInputElement[]>([]);
+  // … render `length` inputs, each wired to update the correct digit
+  // when any input changes, do: onChange(newFullValue);
   return (
     <div className="flex space-x-2">
-      {padded.split("").map((char, i) => (
+      {Array.from({ length }).map((_, i) => (
         <input
           key={i}
-          ref={(el) => (inputsRef.current[i] = el)}
           type="text"
-          inputMode="numeric"
           maxLength={1}
-          value={char === " " ? "" : char}
-          onChange={(e) => handleChange(e, i)}
-          onKeyDown={(e) => handleKey(e, i)}
-          onPaste={handlePaste}
-          className="w-10 h-12 text-center border rounded-md focus:ring focus:outline-none"
+          value={value[i] || ""}
+          onChange={(e) => {
+            const chars = value.split("");
+            chars[i] = e.target.value;
+            onChange(chars.join(""));
+          }}
+          ref={(el) => {
+            if (el) inputs.current[i] = el;
+          }}
+          className="w-10 h-10 text-center border rounded"
         />
       ))}
     </div>
