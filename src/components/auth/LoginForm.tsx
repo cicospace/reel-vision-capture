@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { ADMIN_EMAIL, validateAccessCode, setAuthenticatedState } from "@/utils/authUtils";
+import { ADMIN_EMAIL, validateAccessCode } from "@/utils/authUtils";
 import SimpleOtp from "@/components/ui/SimpleOtp";
 
 export default function LoginForm() {
@@ -54,7 +54,6 @@ export default function LoginForm() {
 
       if (!data?.session) throw new Error("Authentication failed");
 
-      setAuthenticatedState();
       toast.success("Welcome back!");
       
       // Fix the location state type handling
