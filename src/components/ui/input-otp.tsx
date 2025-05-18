@@ -1,46 +1,44 @@
 
-import React from "react";
+import React, { useRef } from 'react';
 
 export interface InputOTPProps {
-  /** The full OTP value as a string, e.g. "123456" */
   value: string;
-  /** Called any time the OTP changes; receives the new full string */
-  onChange: (value: string) => void;
-  /** How many digits/boxes to render (default 6) */
+  onChange: (newValue: string) => void;
   length?: number;
 }
 
-const InputOTP = ({
+export default function InputOTP({
   value,
   onChange,
   length = 6,
-}: InputOTPProps) => {
-  // Split the incoming string into an array of characters, padded to `length`
-  const chars = Array.from(value.padEnd(length, ' ').slice(0, length));
+}: InputOTPProps) {
+  const inputs = useRef<Array<HTMLInputElement | null>>([]);
 
-  const handleChange = (index: number) => (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const next = [...chars];
-    next[index] = e.target.value.slice(-1) || ' ';
-    onChange(next.join('').trim());
+  // Pad or slice value to exactly `length` characters
+  const chars = value.split('').concat(Array(length).fill('')).slice(0, length);
+
+  const handleInput = (idx: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const v = e.target.value.slice(-1);        // keep only last char
+    const newChars = [...chars];
+    newChars[idx] = v;
+    onChange(newChars.join(''));
+    if (v && inputs.current[idx + 1]) inputs.current[idx + 1]!.focus();
   };
 
   return (
     <div className="flex space-x-2">
-      {chars.map((char, i) => (
+      {chars.map((c, i) => (
         <input
           key={i}
+          ref={el => inputs.current[i] = el}
           type="text"
           inputMode="numeric"
           maxLength={1}
-          value={char.trim()}
-          onChange={handleChange(i)}
+          value={c}
+          onChange={handleInput(i)}
           className="w-12 h-12 text-center border border-gray-300 rounded bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
         />
       ))}
     </div>
   );
-};
-
-export default InputOTP;
+}
