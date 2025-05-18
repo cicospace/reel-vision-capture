@@ -28,16 +28,6 @@ export const logAuthState = async () => {
   });
 };
 
-// Log Supabase connection information
-export const logSupabaseConnection = () => {
-  console.log('Supabase connection check:', {
-    hasSupabase: !!supabase,
-    hasInsertMethod: !!(supabase && supabase.from),
-    // Removing direct access to protected supabaseUrl property
-    url: "https://hxcceigrkxcaxsiikuvs.supabase.co" // Using the hardcoded URL from the client.ts
-  });
-};
-
 // Log navigation events
 export const logNavigation = (from: string, to: string, params?: Record<string, any>) => {
   console.log(`Navigation: ${from} → ${to}`, params || {});
