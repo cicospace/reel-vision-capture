@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import OtpInput from "@/components/ui/OtpInput";
@@ -129,7 +128,6 @@ const LoginForm = ({ onLoginSuccess }: LoginFormProps) => {
           <OtpInput 
             value={accessCode} 
             onChange={setAccessCode} 
-            length={6}
           />
         </div>
       </div>
