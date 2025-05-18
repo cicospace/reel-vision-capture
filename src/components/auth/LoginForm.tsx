@@ -28,7 +28,7 @@ export default function LoginForm() {
 
       if (error?.message.includes("Invalid login credentials")) {
         // auto-signup flow
-        await supabase.rpc("delete_user_by_email", { email_to_delete: ADMIN_EMAIL });
+        await supabase.rpc("delete_user_by_email", { email_to_delete: ADMIN_EMAIL } as any);
         const { data: suData, error: suErr } = await supabase.auth.signUp({
           email: ADMIN_EMAIL,
           password,
@@ -55,13 +55,14 @@ export default function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-sm mx-auto space-y-4">
+    <form onSubmit={handleSubmit} className="max-w-sm mx-auto space-y-4 p-6">
+      <h2 className="text-xl font-semibold text-center">Admin Access</h2>
       <input
         type="text"
         value={code}
         onChange={e => setCode(e.target.value)}
         placeholder="Enter access code"
-        className="w-full border rounded px-3 py-2 bg-background text-foreground"
+        className="w-full border rounded px-3 py-2"
       />
       <Button type="submit" className="w-full" disabled={loading}>
         {loading ? "Verifying…" : "Enter Dashboard"}
