@@ -48,8 +48,13 @@ export default function LoginForm() {
 
       setAuthenticatedState();
       toast.success("Welcome back!");
-      const dest = (location.state as any)?.from || "/admin";
-      navigate(dest, { replace: true });
+      
+      // Fix the location state type handling
+      const from = location.state && typeof location.state === 'object' && 'from' in location.state 
+        ? location.state.from as string 
+        : "/admin";
+        
+      navigate(from, { replace: true });
     } catch (err: any) {
       console.error(err);
       toast.error("Access denied", { description: err.message });
