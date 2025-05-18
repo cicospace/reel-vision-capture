@@ -1,24 +1,34 @@
 
+import { supabase } from "@/integrations/supabase/client";
+
 export const ADMIN_EMAIL = 'admin@example.com';
 
 export function validateAccessCode(code: string): boolean {
   return /^\d{6}$/.test(code);
 }
 
-// NOTE: These functions are kept for compatibility with existing code
-// But authentication is now primarily managed by Supabase sessions
+// These functions are now primarily used for backward compatibility
+// The main authentication is managed by Supabase sessions
 export function setAuthenticatedState(): void {
-  // This is no longer the primary auth mechanism
-  // Left for backward compatibility
   localStorage.setItem('isAdmin', 'true');
 }
 
 export function clearAuthenticatedState(): void {
   localStorage.removeItem('isAdmin');
+  // Also sign out from Supabase to ensure consistency
+  supabase.auth.signOut().catch(error => {
+    console.error("Error during sign out:", error);
+  });
 }
 
-export function isAuthenticated(): boolean {
-  // This function is now primarily used as a fallback
-  // The main authentication check should use Supabase auth state
-  return localStorage.getItem('isAdmin') === 'true';
+export async function isAuthenticated(): Promise<boolean> {
+  try {
+    const { data } = await supabase.auth.getSession();
+    // If we have a session, the user is authenticated
+    return !!data.session;
+  } catch (error) {
+    console.error("Error checking authentication:", error);
+    // Fall back to localStorage if Supabase auth check fails
+    return localStorage.getItem('isAdmin') === 'true';
+  }
 }

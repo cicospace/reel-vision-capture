@@ -3,15 +3,13 @@ import { ReactNode, useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import LoadingSpinner from "@/components/ui/loading-spinner";
-import { logAuthState } from "@/utils/loggingUtils";
-import { setAuthenticatedState, clearAuthenticatedState } from "@/utils/authUtils";
 
 interface ProtectedRouteProps {
   children: ReactNode;
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const [loading, setLoading] = useState(true);
+  const [authChecked, setAuthChecked] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
   const location = useLocation();
 
@@ -26,12 +24,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
             console.log("ProtectedRoute: Auth state change event:", event);
             const isAuthed = !!session;
             setAuthenticated(isAuthed);
-            
-            if (isAuthed) {
-              setAuthenticatedState();
-            } else {
-              clearAuthenticatedState();
-            }
+            setAuthChecked(true);
           }
         );
         
@@ -41,34 +34,28 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
         if (error) {
           console.error("ProtectedRoute auth error:", error);
           setAuthenticated(false);
-          clearAuthenticatedState();
+          setAuthChecked(true);
         } else {
           const isAuthed = !!data.session;
           console.log("ProtectedRoute: Session check result:", isAuthed ? "authenticated" : "not authenticated");
           setAuthenticated(isAuthed);
-          
-          if (isAuthed) {
-            setAuthenticatedState();
-          } else {
-            clearAuthenticatedState();
-          }
+          setAuthChecked(true);
         }
 
-        // Log detailed auth state for debugging
-        await logAuthState();
+        return () => {
+          subscription.unsubscribe();
+        };
       } catch (error) {
         console.error("ProtectedRoute unexpected error:", error);
         setAuthenticated(false);
-        clearAuthenticatedState();
-      } finally {
-        setLoading(false);
+        setAuthChecked(true);
       }
     };
 
     checkAuth();
   }, [location.pathname]);
 
-  if (loading) {
+  if (!authChecked) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <LoadingSpinner size="lg" />
@@ -77,9 +64,9 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   }
 
   if (!authenticated) {
-    console.log("ProtectedRoute: Not authenticated, redirecting to /auth with state:", { from: location.pathname });
+    console.log("ProtectedRoute: Not authenticated, redirecting to /auth with state:", { from: location.pathname + location.search });
     // Store the current location to redirect back after login
-    return <Navigate to="/auth" state={{ from: location.pathname }} replace />;
+    return <Navigate to="/auth" state={{ from: location.pathname + location.search }} replace />;
   }
 
   console.log("ProtectedRoute: User is authenticated, rendering protected content");

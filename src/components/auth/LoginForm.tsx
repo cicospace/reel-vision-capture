@@ -29,7 +29,6 @@ export default function LoginForm() {
 
       if (error?.message.includes("Invalid login credentials")) {
         // auto-signup flow
-        // We need to explicitly type the parameter to fix the TS2345 error
         const { error: deleteError } = await supabase.functions.invoke(
           "delete-user-by-email",
           {
@@ -56,11 +55,15 @@ export default function LoginForm() {
 
       toast.success("Welcome back!");
       
-      // Fix the location state type handling
-      const from = location.state && typeof location.state === 'object' && 'from' in location.state 
-        ? location.state.from as string 
-        : "/admin";
-        
+      // Get the redirect path from location state or default to "/admin"
+      const from = location.state && 
+                  typeof location.state === 'object' && 
+                  'from' in location.state && 
+                  typeof location.state.from === 'string' 
+                    ? location.state.from 
+                    : "/admin";
+      
+      console.log("LoginForm: Authentication successful, redirecting to:", from);
       navigate(from, { replace: true });
     } catch (err: any) {
       console.error(err);

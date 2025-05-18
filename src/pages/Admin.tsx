@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlusCircle, LogOut } from "lucide-react";
 import { toast } from "sonner";
-import { isAuthenticated, clearAuthenticatedState } from "@/utils/authUtils";
+import { clearAuthenticatedState, isAuthenticated } from "@/utils/authUtils";
 
 type Submission = {
   id: string;
@@ -24,12 +23,16 @@ const Admin = () => {
 
   useEffect(() => {
     // Check authentication
-    if (!isAuthenticated()) {
-      navigate('/auth');
-      return;
-    }
+    const checkAuthentication = async () => {
+      const authed = await isAuthenticated();
+      if (!authed) {
+        navigate('/auth');
+        return;
+      }
+      fetchSubmissions();
+    };
 
-    fetchSubmissions();
+    checkAuthentication();
   }, [navigate]);
 
   const fetchSubmissions = async () => {
@@ -53,9 +56,16 @@ const Admin = () => {
     }
   };
 
-  const handleLogout = () => {
-    clearAuthenticatedState();
-    navigate('/auth');
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      clearAuthenticatedState();
+      toast.success("Logged out successfully");
+      navigate('/auth');
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast.error("Failed to log out");
+    }
   };
 
   return (

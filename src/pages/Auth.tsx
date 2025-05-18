@@ -18,11 +18,16 @@ const Auth = () => {
         
         if (data?.session) {
           console.log("Auth page: User already authenticated, redirecting");
-          // Get the redirect path from location state or default to "/admin"
-          const from = location.state && typeof location.state === 'object' && 'from' in location.state 
-            ? location.state.from as string 
-            : "/admin";
           
+          // Get the redirect path from location state or default to "/admin"
+          const from = location.state && 
+                      typeof location.state === 'object' && 
+                      'from' in location.state && 
+                      typeof location.state.from === 'string' 
+                        ? location.state.from 
+                        : "/admin";
+          
+          console.log("Auth page: Redirecting to:", from);
           navigate(from, { replace: true });
         }
       } catch (error) {
