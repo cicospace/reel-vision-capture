@@ -61,13 +61,12 @@ export default function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="max-w-sm mx-auto space-y-4 p-6">
       <h2 className="text-xl font-semibold text-center">Admin Access</h2>
-      <input
-        type="text"
-        value={code}
-        onChange={e => setCode(e.target.value)}
-        placeholder="Enter access code"
-        className="w-full border rounded px-3 py-2"
-      />
+      <div className="flex justify-center mb-4">
+        <SimpleOtp 
+          value={code} 
+          onChange={(newCode: string) => setCode(newCode)} 
+        />
+      </div>
       <Button type="submit" className="w-full" disabled={loading}>
         {loading ? "Verifying…" : "Enter Dashboard"}
       </Button>
