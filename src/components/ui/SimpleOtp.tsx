@@ -1,22 +1,20 @@
 
 import React from 'react';
 
-export interface OtpInputProps {
+interface SimpleOtpProps {
   value: string;
-  onChange: (value: string) => void;
-  length?: number;
+  onChange: (newVal: string) => void;
 }
 
-const OtpInput: React.FC<OtpInputProps> = ({ value, onChange, length = 6 }) => {
+export default function SimpleOtp({ value, onChange }: SimpleOtpProps) {
   return (
     <input
       type="text"
+      maxLength={6}
       value={value}
       onChange={e => onChange(e.target.value)}
-      maxLength={length}
       className="p-2 border rounded w-full text-center"
+      placeholder="Enter 6-digit code"
     />
   );
-};
-
-export default OtpInput;
+}
