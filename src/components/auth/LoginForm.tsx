@@ -29,10 +29,12 @@ export default function LoginForm() {
 
       if (error?.message.includes("Invalid login credentials")) {
         // auto-signup flow
-        // Use a properly typed parameter object for the RPC call
-        const { error: deleteError } = await supabase.rpc(
-          "delete_user_by_email", 
-          { email_to_delete: ADMIN_EMAIL } as { email_to_delete: string }
+        // We need to explicitly type the parameter to fix the TS2345 error
+        const { error: deleteError } = await supabase.functions.invoke(
+          "delete-user-by-email",
+          {
+            body: { email: ADMIN_EMAIL }
+          }
         );
         
         if (deleteError) {
