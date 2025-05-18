@@ -14,15 +14,17 @@ export default function InputOTP({
 }: InputOTPProps) {
   const inputs = useRef<Array<HTMLInputElement | null>>([]);
 
-  // Pad or slice value to exactly `length` characters
-  const chars = value.split('').concat(Array(length).fill('')).slice(0, length);
+  // build array of exactly `length` characters
+  const chars = value.padEnd(length, ' ').split('').slice(0, length);
 
-  const handleInput = (idx: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const v = e.target.value.slice(-1);        // keep only last char
+  const handleChange = (idx: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const v = e.target.value.slice(-1);
     const newChars = [...chars];
     newChars[idx] = v;
-    onChange(newChars.join(''));
-    if (v && inputs.current[idx + 1]) inputs.current[idx + 1]!.focus();
+    onChange(newChars.join('').trimEnd());
+    if (v && inputs.current[idx + 1]) {
+      inputs.current[idx + 1]!.focus();
+    }
   };
 
   return (
@@ -30,12 +32,12 @@ export default function InputOTP({
       {chars.map((c, i) => (
         <input
           key={i}
-          ref={el => inputs.current[i] = el}
+          ref={el => (inputs.current[i] = el)}
           type="text"
           inputMode="numeric"
           maxLength={1}
           value={c}
-          onChange={handleInput(i)}
+          onChange={handleChange(i)}
           className="w-12 h-12 text-center border border-gray-300 rounded bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
         />
       ))}

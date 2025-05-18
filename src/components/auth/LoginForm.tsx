@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import InputOTP from "@/components/ui/input-otp";  // Updated to use default import
+import InputOTP from "../ui/input-otp";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
