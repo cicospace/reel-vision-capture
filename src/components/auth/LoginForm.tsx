@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import SimpleOtp from "@/components/ui/SimpleOtp";
@@ -82,7 +81,7 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
 
       onLoginSuccess?.();
 
-      const redirectTo = (location.state as { from?: string })?.from || "/admin";
+      const redirectTo = location.state && (location.state as { from?: string }).from || "/admin";
       navigate(redirectTo, { replace: true });
     } catch (err: any) {
       toast.error("Access denied", {
