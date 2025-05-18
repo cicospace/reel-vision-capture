@@ -1,4 +1,5 @@
 
+// src/components/ui/input-otp.tsx
 import React, { useRef } from 'react';
 
 export interface InputOTPProps {
@@ -38,7 +39,7 @@ export default function InputOTP({
           maxLength={1}
           value={c}
           onChange={handleChange(i)}
-          className="w-12 h-12 text-center border border-gray-300 rounded bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+          className="w-12 h-12 text-center border rounded"
         />
       ))}
     </div>
