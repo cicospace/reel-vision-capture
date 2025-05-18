@@ -4,6 +4,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import LoadingSpinner from "@/components/ui/loading-spinner";
 import { logAuthState } from "@/utils/loggingUtils";
+import { setAuthenticatedState, clearAuthenticatedState } from "@/utils/authUtils";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -19,16 +20,38 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
       console.log("ProtectedRoute: Checking auth state for path:", location.pathname);
       
       try {
-        // First check with Supabase as the source of truth
+        // First set up auth state listener
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+          (event, session) => {
+            console.log("ProtectedRoute: Auth state change event:", event);
+            const isAuthed = !!session;
+            setAuthenticated(isAuthed);
+            
+            if (isAuthed) {
+              setAuthenticatedState();
+            } else {
+              clearAuthenticatedState();
+            }
+          }
+        );
+        
+        // Then check for existing session
         const { data, error } = await supabase.auth.getSession();
         
         if (error) {
           console.error("ProtectedRoute auth error:", error);
           setAuthenticated(false);
+          clearAuthenticatedState();
         } else {
           const isAuthed = !!data.session;
           console.log("ProtectedRoute: Session check result:", isAuthed ? "authenticated" : "not authenticated");
           setAuthenticated(isAuthed);
+          
+          if (isAuthed) {
+            setAuthenticatedState();
+          } else {
+            clearAuthenticatedState();
+          }
         }
 
         // Log detailed auth state for debugging
@@ -36,22 +59,13 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
       } catch (error) {
         console.error("ProtectedRoute unexpected error:", error);
         setAuthenticated(false);
+        clearAuthenticatedState();
       } finally {
         setLoading(false);
       }
     };
 
     checkAuth();
-
-    // Set up auth state change listener
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("ProtectedRoute: Auth state change event:", event);
-      setAuthenticated(!!session);
-    });
-
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
   }, [location.pathname]);
 
   if (loading) {

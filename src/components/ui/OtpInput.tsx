@@ -1,8 +1,7 @@
 
-// src/components/ui/SimpleOtp.tsx
 import React, { useRef, useEffect } from "react";
 
-interface SimpleOtpProps {
+interface OtpInputProps {
   /** The full OTP string */
   value: string;
   /** Called whenever value changes — receives the new full string */
@@ -11,11 +10,11 @@ interface SimpleOtpProps {
   length?: number;
 }
 
-export default function SimpleOtp({
+export default function OtpInput({
   value,
   onChange,
   length = 6,
-}: SimpleOtpProps) {
+}: OtpInputProps) {
   const inputs = useRef<HTMLInputElement[]>([]);
 
   // Auto-focus to next input after typing a character

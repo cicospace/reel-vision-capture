@@ -10,7 +10,6 @@ import Auth from "./pages/Auth";
 import SubmissionDetail from "./pages/SubmissionDetail";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
-import AuthWrapper from "./components/AuthWrapper";
 
 // Create a new QueryClient instance with retry configuration
 const queryClient = new QueryClient({

@@ -24,13 +24,20 @@ const Auth = () => {
           console.log("Auth page: User already authenticated");
           await logAuthState();
           
-          const from = location.state?.from || "/admin";
+          // Safely extract the "from" path from location state
+          let from = "/admin";
+          if (
+            location.state && 
+            typeof location.state === 'object' && 
+            'from' in location.state
+          ) {
+            from = location.state.from as string;
+          }
+          
           console.log("Auth page: Redirecting to:", from);
           logNavigation("/auth", from, { reason: "already_authenticated" });
           
-          setTimeout(() => {
-            navigate(from, { replace: true });
-          }, 100); // Small delay to ensure state updates
+          navigate(from, { replace: true });
         } else {
           console.log("Auth page: User not authenticated");
         }

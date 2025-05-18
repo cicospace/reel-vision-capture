@@ -5,7 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ADMIN_EMAIL, validateAccessCode, setAuthenticatedState } from "@/utils/authUtils";
-import SimpleOtp from "@/components/ui/SimpleOtp";
 
 export default function LoginForm() {
   const [code, setCode] = useState("");
@@ -67,9 +66,16 @@ export default function LoginForm() {
     <form onSubmit={handleSubmit} className="max-w-sm mx-auto space-y-4 p-6">
       <h2 className="text-xl font-semibold text-center">Admin Access</h2>
       <div className="flex justify-center mb-4">
-        <SimpleOtp 
-          value={code} 
-          onChange={(newCode: string) => setCode(newCode)} 
+        <input
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          maxLength={6}
+          className="w-40 text-center border rounded p-2"
+          placeholder="Enter 6-digit code"
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+          aria-label="Access code"
         />
       </div>
       <Button type="submit" className="w-full" disabled={loading}>
