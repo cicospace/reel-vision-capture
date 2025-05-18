@@ -2,12 +2,26 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Card } from "@/components/ui/card";
-import { CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+import { 
+  Card, CardHeader, CardTitle, CardContent, CardFooter 
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft } from "lucide-react";
+import { 
+  ChevronLeft, User, Phone, Globe, FileText, Calendar,
+  Award, Clock, Folder, Info, Link, Layout, LayoutDashboard
+} from "lucide-react";
 import LoadingSpinner from "@/components/ui/loading-spinner";
 import { useToast } from "@/hooks/use-toast";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
+import { 
+  Accordion, 
+  AccordionContent, 
+  AccordionItem, 
+  AccordionTrigger 
+} from "@/components/ui/accordion";
+import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 type ReelExample = {
   id: string;
@@ -127,203 +141,465 @@ const SubmissionDetail = () => {
     );
   }
 
+  // Helper function for formatting dates
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  // Helper function to get status badge variant
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'pending': return 'default';
+      case 'approved': return 'secondary';
+      case 'completed': return 'outline';
+      case 'rejected': return 'destructive';
+      default: return 'default';
+    }
+  };
+
+  // Helper function for external links
+  const formatExternalLink = (url: string) => {
+    if (!url) return '';
+    return url.startsWith('http') ? url : `https://${url}`;
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      <header className="bg-card shadow">
+      <header className="bg-card shadow-sm border-b">
         <div className="container max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center">
-            <div className="flex items-center">
+            <div className="flex items-center space-x-3">
               <Button 
                 variant="ghost" 
                 size="sm" 
                 onClick={() => navigate('/admin')}
-                className="mr-2"
               >
                 <ChevronLeft className="h-4 w-4 mr-1" />
                 Back
               </Button>
-              <h1 className="text-xl font-semibold text-foreground">
+              <h1 className="text-xl font-semibold text-foreground flex items-center">
+                <User className="h-5 w-5 mr-2 text-muted-foreground" />
                 {submission.first_name} {submission.last_name}'s Submission
               </h1>
             </div>
+            <Badge variant={getStatusBadgeVariant(submission.status)}>
+              {submission.status}
+            </Badge>
           </div>
         </div>
       </header>
 
       <main className="container max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <Card className="max-w-4xl mx-auto">
-          <CardHeader>
-            <CardTitle>Submission Details</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <section className="space-y-4">
-              <h3 className="text-lg font-medium">Contact Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <p>
-                  <strong>Name:</strong> {submission.first_name} {submission.last_name}
-                </p>
-                <p>
-                  <strong>Email:</strong> {submission.email}
-                </p>
-                <p>
-                  <strong>Phone:</strong> {submission.cell_phone}
-                </p>
-                <p>
-                  <strong>Website:</strong> {" "}
-                  {submission.website && (
-                    <a 
-                      href={submission.website.startsWith('http') ? submission.website : `https://${submission.website}`} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-primary hover:underline"
-                    >
-                      {submission.website}
-                    </a>
-                  )}
-                </p>
-                <p>
-                  <strong>Problem Solved:</strong> {submission.problem_solved}
-                </p>
-                <p>
-                  <strong>Status:</strong> {" "}
-                  <span className="inline-block px-2 py-1 text-xs font-medium rounded-full bg-primary/20 text-primary">
-                    {submission.status}
-                  </span>
-                </p>
-              </div>
-            </section>
+        <Card className="max-w-5xl mx-auto overflow-hidden">
+          <CardContent className="p-0">
+            <Tabs defaultValue="overview" className="w-full">
+              <TabsList className="w-full justify-start rounded-none border-b bg-card p-0">
+                <TabsTrigger 
+                  value="overview" 
+                  className="data-[state=active]:bg-background data-[state=active]:shadow-none data-[state=active]:border-primary data-[state=active]:border-b-2 rounded-none py-3"
+                >
+                  <LayoutDashboard className="h-4 w-4 mr-2" />
+                  Overview
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="content" 
+                  className="data-[state=active]:bg-background data-[state=active]:shadow-none data-[state=active]:border-primary data-[state=active]:border-b-2 rounded-none py-3"
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  Content Details
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="branding" 
+                  className="data-[state=active]:bg-background data-[state=active]:shadow-none data-[state=active]:border-primary data-[state=active]:border-b-2 rounded-none py-3"
+                >
+                  <Award className="h-4 w-4 mr-2" />
+                  Branding
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="info" 
+                  className="data-[state=active]:bg-background data-[state=active]:shadow-none data-[state=active]:border-primary data-[state=active]:border-b-2 rounded-none py-3"
+                >
+                  <Info className="h-4 w-4 mr-2" />
+                  Additional Info
+                </TabsTrigger>
+              </TabsList>
 
-            <section className="space-y-4">
-              <h3 className="text-lg font-medium">Project Preferences</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <p>
-                  <strong>Tone:</strong> {submission.tone.join(', ')}
-                  {submission.other_tone && ` (${submission.other_tone})`}
-                </p>
-                <p>
-                  <strong>Duration:</strong> {submission.duration}
-                  {submission.other_duration && ` (${submission.other_duration})`}
-                </p>
-              </div>
-            </section>
+              {/* Overview Tab */}
+              <TabsContent value="overview" className="p-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* Contact Information Card */}
+                  <Card className="lg:col-span-2">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-lg flex items-center">
+                        <User className="h-5 w-5 mr-2 text-primary" />
+                        Contact Information
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Name</p>
+                          <p className="text-foreground">{submission.first_name} {submission.last_name}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Email</p>
+                          <p className="text-foreground">{submission.email}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Phone</p>
+                          <p className="text-foreground">{submission.cell_phone}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Website</p>
+                          {submission.website ? (
+                            <a 
+                              href={formatExternalLink(submission.website)} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-primary hover:underline inline-flex items-center"
+                            >
+                              {submission.website}
+                              <Link className="h-3 w-3 ml-1" />
+                            </a>
+                          ) : (
+                            <p className="text-muted-foreground">Not provided</p>
+                          )}
+                        </div>
+                      </div>
 
-            <section className="space-y-4">
-              <h3 className="text-lg font-medium">Reel Examples</h3>
-              {submission.reel_examples && submission.reel_examples.length > 0 ? (
-                <ul className="space-y-2">
-                  {submission.reel_examples.map(example => (
-                    <li key={example.id} className="p-3 bg-muted rounded-md">
-                      <a 
-                        href={example.link} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-primary hover:underline"
-                      >
-                        {example.link}
-                      </a>
-                      {example.comment && (
-                        <p className="text-sm text-muted-foreground mt-1">
-                          "{example.comment}"
-                        </p>
+                      <div className="mt-4">
+                        <p className="text-sm font-medium text-muted-foreground">Problem Solved</p>
+                        <p className="text-foreground">{submission.problem_solved}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Project Preferences Card */}
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-lg flex items-center">
+                        <Layout className="h-5 w-5 mr-2 text-primary" />
+                        Project Preferences
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Tone</p>
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {submission.tone.map((item) => (
+                              <Badge key={item} variant="secondary" className="mr-1 mb-1">
+                                {item}
+                              </Badge>
+                            ))}
+                            {submission.other_tone && (
+                              <Badge variant="outline" className="mr-1 mb-1">
+                                {submission.other_tone}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Duration</p>
+                          <p className="text-foreground">
+                            {submission.duration}
+                            {submission.other_duration && ` (${submission.other_duration})`}
+                          </p>
+                        </div>
+
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Status</p>
+                          <Badge variant={getStatusBadgeVariant(submission.status)}>
+                            {submission.status}
+                          </Badge>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Timeline Card */}
+                  <Card className="lg:col-span-3">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-lg flex items-center">
+                        <Calendar className="h-5 w-5 mr-2 text-primary" />
+                        Timeline
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="flex items-center">
+                          <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
+                          <div>
+                            <p className="text-sm font-medium">Created</p>
+                            <p className="text-sm text-muted-foreground">
+                              {formatDate(submission.created_at)}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center">
+                          <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
+                          <div>
+                            <p className="text-sm font-medium">Last Updated</p>
+                            <p className="text-sm text-muted-foreground">
+                              {formatDate(submission.updated_at)}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+
+              {/* Content Details Tab */}
+              <TabsContent value="content" className="p-6 space-y-6">
+                {/* Reel Examples */}
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg flex items-center">
+                      <FileText className="h-5 w-5 mr-2 text-primary" />
+                      Reel Examples
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {submission.reel_examples && submission.reel_examples.length > 0 ? (
+                      <div className="space-y-3">
+                        {submission.reel_examples.map((example, index) => (
+                          <div key={example.id} className="bg-muted rounded-md p-3">
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <a 
+                                  href={example.link} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-primary hover:underline flex items-center"
+                                >
+                                  <Link className="h-4 w-4 mr-1" />
+                                  Example {index + 1}
+                                </a>
+                                {example.comment && (
+                                  <p className="text-sm text-muted-foreground mt-1">
+                                    "{example.comment}"
+                                  </p>
+                                )}
+                              </div>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button 
+                                      size="sm" 
+                                      variant="ghost"
+                                      onClick={() => window.open(example.link, '_blank')}
+                                    >
+                                      View
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Open in new tab</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground">No reel examples provided.</p>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Footage Information */}
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg flex items-center">
+                      <Folder className="h-5 w-5 mr-2 text-primary" />
+                      Footage Information
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">Footage Link</p>
+                        {submission.footage_link ? (
+                          <a 
+                            href={formatExternalLink(submission.footage_link)} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-primary hover:underline inline-flex items-center"
+                          >
+                            {submission.footage_link}
+                            <Link className="h-3 w-3 ml-1" />
+                          </a>
+                        ) : (
+                          <p className="text-muted-foreground">Not provided</p>
+                        )}
+                      </div>
+                      
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">Footage Types</p>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {submission.footage_types.map((type) => (
+                            <Badge key={type} variant="secondary" className="mr-1 mb-1">
+                              {type}
+                            </Badge>
+                          ))}
+                          {submission.other_footage_type && (
+                            <Badge variant="outline" className="mr-1 mb-1">
+                              {submission.other_footage_type}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Creative Direction */}
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg flex items-center">
+                      <Layout className="h-5 w-5 mr-2 text-primary" />
+                      Creative Direction
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Accordion type="single" collapsible className="w-full">
+                      <AccordionItem value="script-structure">
+                        <AccordionTrigger className="text-md font-medium">
+                          Script Structure
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <p className="whitespace-pre-wrap text-muted-foreground">
+                            {submission.script_structure || "Not provided"}
+                          </p>
+                        </AccordionContent>
+                      </AccordionItem>
+                      
+                      <AccordionItem value="non-negotiable-clips">
+                        <AccordionTrigger className="text-md font-medium">
+                          Non-Negotiable Clips
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <p className="whitespace-pre-wrap text-muted-foreground">
+                            {submission.non_negotiable_clips || "Not provided"}
+                          </p>
+                        </AccordionContent>
+                      </AccordionItem>
+                      
+                      <AccordionItem value="testimonials">
+                        <AccordionTrigger className="text-md font-medium">
+                          Testimonials
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <p className="whitespace-pre-wrap text-muted-foreground">
+                            {submission.testimonials || "Not provided"}
+                          </p>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Branding Tab */}
+              <TabsContent value="branding" className="p-6">
+                <div className="space-y-6">
+                  {/* Logo and Branding */}
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-lg flex items-center">
+                        <Award className="h-5 w-5 mr-2 text-primary" />
+                        Logo & Branding
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm font-medium text-muted-foreground">Logo Folder Link</p>
+                      {submission.logo_folder_link ? (
+                        <a 
+                          href={formatExternalLink(submission.logo_folder_link)} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline inline-flex items-center"
+                        >
+                          {submission.logo_folder_link}
+                          <Link className="h-3 w-3 ml-1" />
+                        </a>
+                      ) : (
+                        <p className="text-muted-foreground">Not provided</p>
                       )}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-muted-foreground">No reel examples provided.</p>
-              )}
-            </section>
+                    </CardContent>
+                  </Card>
 
-            <section className="space-y-4">
-              <h3 className="text-lg font-medium">Footage Information</h3>
-              <div className="grid grid-cols-1 gap-4">
-                <p>
-                  <strong>Footage Link:</strong>{" "}
-                  {submission.footage_link && (
-                    <a 
-                      href={submission.footage_link.startsWith('http') ? submission.footage_link : `https://${submission.footage_link}`} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-primary hover:underline"
-                    >
-                      {submission.footage_link}
-                    </a>
-                  )}
-                </p>
-                <p>
-                  <strong>Footage Types:</strong> {submission.footage_types.join(', ')}
-                  {submission.other_footage_type && ` (${submission.other_footage_type})`}
-                </p>
-              </div>
-            </section>
+                  {/* Credibility Markers */}
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-lg flex items-center">
+                        <Award className="h-5 w-5 mr-2 text-primary" />
+                        Credibility Markers
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Selected Markers</p>
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {submission.credibility_markers.map((marker) => (
+                              <Badge key={marker} variant="secondary" className="mr-1 mb-1">
+                                {marker}
+                              </Badge>
+                            ))}
+                            {submission.other_credibility_marker && (
+                              <Badge variant="outline" className="mr-1 mb-1">
+                                {submission.other_credibility_marker}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
 
-            <section className="space-y-4">
-              <h3 className="text-lg font-medium">Creative Direction</h3>
-              <div className="grid grid-cols-1 gap-4">
-                <div>
-                  <strong>Script Structure:</strong>
-                  <p className="mt-1 text-muted-foreground">{submission.script_structure}</p>
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Speaker Bio</p>
+                          <div className="mt-2 p-4 bg-muted rounded-md">
+                            <p className="whitespace-pre-wrap text-foreground">
+                              {submission.speaker_bio || "Not provided"}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
-                <div>
-                  <strong>Non-Negotiable Clips:</strong>
-                  <p className="mt-1 text-muted-foreground">{submission.non_negotiable_clips}</p>
-                </div>
-                <div>
-                  <strong>Testimonials:</strong>
-                  <p className="mt-1 text-muted-foreground">{submission.testimonials}</p>
-                </div>
-              </div>
-            </section>
+              </TabsContent>
 
-            <section className="space-y-4">
-              <h3 className="text-lg font-medium">Credibility & Branding</h3>
-              <div className="grid grid-cols-1 gap-4">
-                <p>
-                  <strong>Logo Folder Link:</strong>{" "}
-                  {submission.logo_folder_link && (
-                    <a 
-                      href={submission.logo_folder_link.startsWith('http') ? submission.logo_folder_link : `https://${submission.logo_folder_link}`} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-primary hover:underline"
-                    >
-                      {submission.logo_folder_link}
-                    </a>
-                  )}
-                </p>
-                <p>
-                  <strong>Credibility Markers:</strong> {submission.credibility_markers.join(', ')}
-                  {submission.other_credibility_marker && ` (${submission.other_credibility_marker})`}
-                </p>
-                <div>
-                  <strong>Speaker Bio:</strong>
-                  <p className="mt-1 text-muted-foreground">{submission.speaker_bio}</p>
-                </div>
-              </div>
-            </section>
-
-            <section className="space-y-4">
-              <h3 className="text-lg font-medium">Additional Information</h3>
-              <div>
-                <p className="text-muted-foreground">{submission.additional_info}</p>
-              </div>
-            </section>
-
-            <section className="space-y-4">
-              <h3 className="text-lg font-medium">Submission Timeline</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <p>
-                  <strong>Created At:</strong>{" "}
-                  {new Date(submission.created_at).toLocaleString()}
-                </p>
-                <p>
-                  <strong>Updated At:</strong>{" "}
-                  {new Date(submission.updated_at).toLocaleString()}
-                </p>
-              </div>
-            </section>
+              {/* Additional Info Tab */}
+              <TabsContent value="info" className="p-6">
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg flex items-center">
+                      <Info className="h-5 w-5 mr-2 text-primary" />
+                      Additional Information
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="p-4 bg-muted rounded-md">
+                      <p className="whitespace-pre-wrap text-foreground">
+                        {submission.additional_info || "No additional information provided."}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
           </CardContent>
-          <CardFooter className="flex justify-center">
+          
+          <CardFooter className="flex justify-center p-6 pt-0">
             <Button 
               variant="outline" 
               onClick={() => navigate('/admin')}
