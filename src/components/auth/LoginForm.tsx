@@ -104,7 +104,10 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
       </div>
 
       <div className="flex justify-center">
-        <SimpleOtp value={accessCode} onChange={setAccessCode} />
+        <SimpleOtp 
+          value={accessCode} 
+          onChange={setAccessCode} 
+        />
       </div>
 
       <Button
