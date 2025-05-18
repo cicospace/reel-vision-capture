@@ -1,83 +1,79 @@
 
-import React, { useState } from 'react';
-import SimpleOtp from '@/components/ui/SimpleOtp';
-import { supabase } from '@/integrations/supabase/client';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { toast } from 'sonner';
-import { ADMIN_EMAIL, validateAccessCode, setAuthenticatedState } from '@/utils/authUtils';
-import { Button } from '@/components/ui/button';
+import { useState, useEffect } from 'react';
+import { Card } from "@/components/ui/card";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate, useLocation } from "react-router-dom";
+import LoginForm from "@/components/auth/LoginForm";
+import LoadingSpinner from "@/components/ui/loading-spinner";
+import { logAuthState, logNavigation } from "@/utils/loggingUtils";
 
-export default function Auth() {
-  const [code, setCode] = useState('');
-  const [loading, setLoading] = useState(false);
+const Auth = () => {
+  const [authChecked, setAuthChecked] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   
-  // Get the redirect path from location state, if provided
-  const redirectTo = (location.state as { from?: string })?.from || '/admin';
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Check if user is already authenticated on component mount
+  useEffect(() => {
+    console.log("Auth page mounted, location state:", JSON.stringify(location.state));
     
-    if (!validateAccessCode(code)) {
-      toast.error('Invalid access code', {
-        description: 'Please enter a valid 6-digit code'
-      });
-      return;
-    }
-    
-    try {
-      setLoading(true);
-      const password = `${code}_supabase`;
-      
-      const { data, error } = await supabase.auth.signInWithPassword({ 
-        email: ADMIN_EMAIL, 
-        password 
-      });
-      
-      if (error) {
-        throw error;
+    const checkExistingAuth = async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        
+        if (data.session) {
+          console.log("Auth page: User already authenticated");
+          await logAuthState();
+          
+          // Safely extract the "from" path from location state
+          let from = "/admin";
+          if (
+            location.state && 
+            typeof location.state === 'object' && 
+            'from' in location.state
+          ) {
+            from = location.state.from as string;
+          }
+          
+          console.log("Auth page: Redirecting to:", from);
+          logNavigation("/auth", from, { reason: "already_authenticated" });
+          
+          navigate(from, { replace: true });
+        } else {
+          console.log("Auth page: User not authenticated");
+        }
+      } catch (error) {
+        console.error("Auth check error:", error);
+      } finally {
+        setAuthChecked(true);
       }
-      
-      setAuthenticatedState();
-      toast.success('Logged in successfully');
-      navigate(redirectTo);
-    } catch (error: any) {
-      console.error('Login error:', error);
-      toast.error('Login failed', {
-        description: error.message
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+    
+    checkExistingAuth();
+  }, [navigate, location.state]);
+
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoadingSpinner size="md" />
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="w-full max-w-md p-8 bg-card rounded-lg shadow-md border">
-        <div className="text-center mb-6">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+      <Card className="w-full max-w-md p-8 border-gray-800 bg-card text-card-foreground">
+        <div className="flex items-center justify-center mb-6">
           <img 
             src="/lovable-uploads/a2a809e3-8770-41b2-bd3e-c4dc102d1aa9.png" 
             alt="Cicospace Logo" 
-            className="h-12 mx-auto mb-2"
+            className="h-16"
           />
-          <h1 className="text-2xl font-bold text-foreground">Admin Access</h1>
-          <p className="text-muted-foreground mt-2">Enter your access code to continue</p>
         </div>
-
-        <form onSubmit={handleLogin} className="space-y-6">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">Access Code</label>
-            <div className="flex justify-center">
-              <SimpleOtp value={code} onChange={setCode} />
-            </div>
-          </div>
-          
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Verifying..." : "Access Dashboard"}
-          </Button>
-        </form>
-      </div>
+        <h1 className="text-2xl font-bold text-center mb-6 text-foreground">Admin Access</h1>
+        <LoginForm />
+      </Card>
     </div>
   );
-}
+};
+
+export default Auth;
