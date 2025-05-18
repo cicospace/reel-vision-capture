@@ -1,10 +1,10 @@
-
+// src/components/ui/SimpleOtp.tsx
 import React, { useRef } from "react";
 
 interface SimpleOtpProps {
   /** The full OTP string */
   value: string;
-  /** Called whenever value changes — will receive the new full string */
+  /** Called whenever value changes — receives the new full string */
   onChange: (newValue: string) => void;
   /** Number of boxes (optional, defaults to 6) */
   length?: number;
@@ -23,19 +23,14 @@ export default function SimpleOtp({
         <input
           key={i}
           type="text"
-          inputMode="numeric"
           maxLength={1}
           value={value[i] || ""}
-          onChange={(e) => {
+          onChange={e => {
             const chars = value.split("");
             chars[i] = e.target.value;
             onChange(chars.join(""));
-            // auto-focus next
-            if (e.target.value && inputs.current[i + 1]) {
-              inputs.current[i + 1].focus();
-            }
           }}
-          ref={(el) => {
+          ref={el => {
             if (el) inputs.current[i] = el;
           }}
           className="w-10 h-10 text-center border rounded"
@@ -44,3 +39,4 @@ export default function SimpleOtp({
     </div>
   );
 }
+
