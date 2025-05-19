@@ -27,6 +27,7 @@ export const useFormSubmission = (
     try {
       console.log("Starting form submission process...");
       console.log("Form state before submission:", JSON.stringify(formState, null, 2));
+      console.log("Checking for brandingGuidelinesFilesLink:", formState.brandingGuidelinesFilesLink);
       
       // Save to Supabase with enhanced error handling
       const { success, submissionId, error } = await saveFormToSupabase(formState);

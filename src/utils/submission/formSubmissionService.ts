@@ -60,8 +60,8 @@ export const saveFormToSupabase = async (formData: any): Promise<SubmissionRespo
     console.log('Supabase URL:', "https://hxcceigrkxcaxsiikuvs.supabase.co");
     console.log('FROM call:', 'submissions');
     console.log('Client config:', {
-      persistSession: false,
-      autoRefreshToken: false
+      persistSession: true,
+      autoRefreshToken: true 
     });
     
     // Insert the main submission with proper await and error checking
@@ -71,6 +71,7 @@ export const saveFormToSupabase = async (formData: any): Promise<SubmissionRespo
       .select();
     
     if (submissionError) {
+      console.error('Submission error details:', submissionError);
       return handleSubmissionError(submissionError);
     }
     
@@ -141,10 +142,10 @@ function validateRequiredFields(formData: any): string[] {
   
   for (const { field, name, isArray } of requiredFields) {
     if (isArray) {
-      if (!Array.isArray(formData[field])) {
-        missingFields.push(`${name} (should be an array)`);
+      if (!Array.isArray(formData[field]) || formData[field].length === 0) {
+        missingFields.push(`${name} (should be a non-empty array)`);
       }
-    } else if (formData[field] === undefined || formData[field] === null) {
+    } else if (!formData[field] || (typeof formData[field] === 'string' && !formData[field].trim())) {
       missingFields.push(name);
     }
   }
