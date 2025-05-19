@@ -29,11 +29,11 @@ const CredibilitySection: React.FC = () => {
       </div>
       <div className="space-y-6">
         <div>
-          <Label className="input-label">Add any testimonials you'd like us to consider *</Label>
+          <Label className="input-label">Add any testimonials you'd like us to consider (Google Doc link preferred) *</Label>
           <Textarea
             value={formState.testimonials}
             onChange={(e) => updateForm('testimonials', e.target.value)}
-            placeholder="Add testimonials that validate your expertise, or enter N/A if not applicable..."
+            placeholder="Add a Google Doc link with testimonials that validate your expertise, or enter N/A if not applicable..."
             className="text-input h-24"
             required
           />
@@ -52,7 +52,7 @@ const CredibilitySection: React.FC = () => {
         </div>
         
         <div>
-          <Label className="input-label">Paste the Google Drive or Dropbox link to your keynote slide deck or key visuals (highly recommended) *</Label>
+          <Label className="input-label">Paste the Google Drive or Dropbox link to your keynote slide deck or key visuals *</Label>
           <Input
             value={formState.deckFilesLink}
             onChange={(e) => updateForm('deckFilesLink', e.target.value)}
@@ -87,11 +87,11 @@ const CredibilitySection: React.FC = () => {
         />
         
         <div>
-          <Label className="input-label">Your current speaker bio *</Label>
+          <Label className="input-label">Your current speaker bio (Google Doc link preferred) *</Label>
           <Textarea
             value={formState.speakerBio}
             onChange={(e) => updateForm('speakerBio', e.target.value)}
-            placeholder="Paste your speaker bio here..."
+            placeholder="Add a Google Doc link with your speaker bio, or paste it directly here..."
             className="text-input h-24 mb-3"
             required
           />

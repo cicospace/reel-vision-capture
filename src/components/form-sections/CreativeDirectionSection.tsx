@@ -20,22 +20,22 @@ const CreativeDirectionSection: React.FC = () => {
       </div>
       <div className="space-y-6">
         <div>
-          <Label className="input-label">Share any general script or flow you'd like the reel to follow *</Label>
+          <Label className="input-label">Share any general script or flow you'd like the reel to follow (Google Doc link preferred) *</Label>
           <Textarea
             value={formState.scriptStructure}
             onChange={(e) => updateForm('scriptStructure', e.target.value)}
-            placeholder="Describe your vision for the reel structure and flow, or enter N/A if not applicable..."
+            placeholder="Add a Google Doc link with your vision for the reel structure and flow, or enter N/A if not applicable..."
             className="text-input h-32"
             required
           />
         </div>
         
         <div>
-          <Label className="input-label">List the clips (with timestamps if possible) that MUST be included *</Label>
+          <Label className="input-label">List the clips that MUST be included (Google Doc link preferred) *</Label>
           <Textarea
             value={formState.nonNegotiableClips}
             onChange={(e) => updateForm('nonNegotiableClips', e.target.value)}
-            placeholder="e.g., 'Main_Stage_Talk.mp4' at 14:35 - audience standing ovation, or enter N/A if not applicable..."
+            placeholder="Add a Google Doc link with your required clips and timestamps, or enter N/A if not applicable..."
             className="text-input h-32"
             required
           />
