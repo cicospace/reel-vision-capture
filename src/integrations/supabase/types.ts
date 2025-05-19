@@ -108,9 +108,11 @@ export type Database = {
       submissions: {
         Row: {
           additional_info: string
+          branding_guidelines_files_link: string | null
           cell_phone: string
           created_at: string
           credibility_markers: string[]
+          deck_files_link: string | null
           duration: string
           email: string
           first_name: string
@@ -127,6 +129,7 @@ export type Database = {
           problem_solved: string
           script_structure: string
           speaker_bio: string
+          speaker_bio_files_link: string | null
           status: string
           testimonials: string
           tone: string[]
@@ -135,9 +138,11 @@ export type Database = {
         }
         Insert: {
           additional_info: string
+          branding_guidelines_files_link?: string | null
           cell_phone: string
           created_at?: string
           credibility_markers: string[]
+          deck_files_link?: string | null
           duration: string
           email: string
           first_name: string
@@ -154,6 +159,7 @@ export type Database = {
           problem_solved: string
           script_structure: string
           speaker_bio: string
+          speaker_bio_files_link?: string | null
           status?: string
           testimonials: string
           tone: string[]
@@ -162,9 +168,11 @@ export type Database = {
         }
         Update: {
           additional_info?: string
+          branding_guidelines_files_link?: string | null
           cell_phone?: string
           created_at?: string
           credibility_markers?: string[]
+          deck_files_link?: string | null
           duration?: string
           email?: string
           first_name?: string
@@ -181,6 +189,7 @@ export type Database = {
           problem_solved?: string
           script_structure?: string
           speaker_bio?: string
+          speaker_bio_files_link?: string | null
           status?: string
           testimonials?: string
           tone?: string[]

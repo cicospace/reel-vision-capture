@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { logAuthState, logSupabaseConnection } from "../loggingUtils";
 import { prepareSubmissionData } from "./submissionDataFormatter";
