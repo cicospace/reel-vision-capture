@@ -3,5 +3,4 @@
 export * from './submission/formSubmissionService';
 export * from './submission/reelExamplesService';
 export * from './submission/submissionDataFormatter';
-export * from './submission/refreshSchemaCache';
 export * from './types';
