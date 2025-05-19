@@ -30,8 +30,7 @@ export function prepareSubmissionData(formData: any) {
     testimonials: formData.testimonials || '',
     logo_folder_link: formData.logoFolderLink || '',
     deck_files_link: formData.deckFilesLink || '',
-    // Using the branding_guidelines property name that matches the database schema
-    branding_guidelines: formData.brandingGuidelinesFilesLink || '',
+    branding_guidelines_files_link: formData.brandingGuidelinesFilesLink || '',
     speaker_bio_files_link: formData.speakerBioFilesLink || '',
     credibility_markers: credibilityMarkers,
     other_credibility_marker: formData.otherCredibilityMarker || null,
