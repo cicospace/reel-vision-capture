@@ -35,6 +35,16 @@ export const useFormSubmission = (
       if (!success) {
         console.error("Failed to save submission to database", error);
         
+        // Handle schema cache specific error
+        if (error?.code === 'SCHEMA_CACHE_REFRESH_NEEDED') {
+          toast.info("Database Update in Progress", {
+            description: "Recent updates to the form require a short cache refresh. Please try submitting again in about 30 seconds.",
+            duration: 8000,
+          });
+          setIsSubmitting(false);
+          return;
+        }
+        
         // Format detailed error message for the user
         let errorMessage = "We couldn't save your submission to our database.";
         

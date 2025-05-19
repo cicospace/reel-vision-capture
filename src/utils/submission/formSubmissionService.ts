@@ -4,6 +4,7 @@ import { logAuthState, logSupabaseConnection } from "../loggingUtils";
 import { prepareSubmissionData } from "./submissionDataFormatter";
 import { handleReelExamples } from "./reelExamplesService";
 import { SubmissionResponse } from "../types";
+import { refreshSchemaCache } from "./refreshSchemaCache";
 
 // Main function to save form data to Supabase
 export const saveFormToSupabase = async (formData: any): Promise<SubmissionResponse> => {
@@ -72,6 +73,26 @@ export const saveFormToSupabase = async (formData: any): Promise<SubmissionRespo
     
     if (submissionError) {
       console.error('Submission error details:', submissionError);
+      
+      // Check if this is a schema cache issue and try to refresh
+      if (submissionError.code === 'PGRST204' && 
+          submissionError.message && 
+          submissionError.message.includes('schema cache')) {
+        
+        console.log('Detected schema cache issue. Attempting to refresh cache...');
+        await refreshSchemaCache();
+        
+        // Inform user this is a temporary issue
+        return { 
+          success: false, 
+          error: {
+            code: 'SCHEMA_CACHE_REFRESH_NEEDED',
+            message: 'Schema cache refresh triggered. Please try submitting again in a moment.',
+            details: { originalError: submissionError }
+          } 
+        };
+      }
+      
       return handleSubmissionError(submissionError);
     }
     

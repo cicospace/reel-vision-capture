@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 import { useFormContext } from "@/context/FormContext";
 
 const FormNavigation: React.FC = () => {
-  const { formState, nextStep, prevStep } = useFormContext();
+  const { formState, nextStep, prevStep, handleSubmit, isSubmitting } = useFormContext();
   const totalSteps = 6;
-
+  
   return (
     <div className="flex justify-between mt-6">
       {formState.step > 1 ? (
@@ -22,7 +22,14 @@ const FormNavigation: React.FC = () => {
           Continue
         </Button>
       ) : (
-        <div></div>
+        <Button 
+          type="button" 
+          onClick={handleSubmit} 
+          disabled={isSubmitting}
+          className="bg-reel-gold hover:bg-yellow-600 text-white"
+        >
+          {isSubmitting ? "Submitting..." : "Submit"}
+        </Button>
       )}
     </div>
   );
