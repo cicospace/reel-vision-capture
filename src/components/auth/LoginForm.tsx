@@ -59,12 +59,7 @@ export default function LoginForm() {
       toast.success("Welcome back!");
       
       // Get the redirect path from location state or default to "/admin"
-      const from = location.state && 
-                  typeof location.state === 'object' && 
-                  'from' in location.state && 
-                  typeof location.state.from === 'string' 
-                    ? location.state.from 
-                    : "/admin";
+      const from = (location.state as any)?.from || "/admin";
       
       console.log("LoginForm: Authentication successful, redirecting to:", from);
       navigate(from, { replace: true });

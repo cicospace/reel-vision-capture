@@ -13,33 +13,16 @@ const Auth = () => {
 
   // Check if user is already authenticated
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const { data } = await supabase.auth.getSession();
-        
-        if (data?.session) {
-          console.log("Auth page: User already authenticated, redirecting");
-          
-          // Get the redirect path from location state or default to "/admin"
-          const from = location.state && 
-                      typeof location.state === 'object' && 
-                      'from' in location.state && 
-                      typeof location.state.from === 'string' 
-                        ? location.state.from 
-                        : "/admin";
-          
-          console.log("Auth page: Redirecting to:", from);
-          navigate(from, { replace: true });
-        }
-      } catch (error) {
-        console.error("Auth check error:", error);
-      } finally {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) {
+        const from = (location.state as any)?.from || "/admin";
+        console.log("Auth page: User already authenticated, redirecting to:", from);
+        navigate(from, { replace: true });
+      } else {
         setLoading(false);
       }
-    };
-
-    checkAuth();
-  }, [navigate, location.state]);
+    });
+  }, [navigate, location]);
 
   if (loading) {
     return (
