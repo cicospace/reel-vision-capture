@@ -17,17 +17,17 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   useEffect(() => {
     console.log("ProtectedRoute: Checking auth state for path:", location.pathname);
     
-    // 1) Get initial session
-    supabase.auth.getSession().then(({ data }) => {
-      console.log('ProtectedRoute session:', data.session);
-      setSession(data.session);
-      setLoading(false);
-    });
-    
-    // 2) Subscribe to future changes
+    // Set up the auth state listener first
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, authSession) => {
       console.log("ProtectedRoute: Auth state change event:", event);
       setSession(authSession);
+    });
+    
+    // Then check for existing session
+    supabase.auth.getSession().then(({ data }) => {
+      console.log('ProtectedRoute session check result:', data.session ? 'Session exists' : 'No session');
+      setSession(data.session);
+      setLoading(false);
     });
     
     return () => {
@@ -35,10 +35,14 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     };
   }, []);
 
+  // Effect for redirecting if no session after loading completes
   useEffect(() => {
     if (!loading && !session) {
-      console.log('No session → redirect to /auth from', location.pathname);
-      navigate('/auth', { state: { from: location.pathname + location.search }, replace: true });
+      console.log('No session → redirect to /auth from', location.pathname + location.search);
+      navigate('/auth', { 
+        state: { from: location.pathname + location.search }, 
+        replace: true 
+      });
     }
   }, [loading, session, navigate, location]);
 

@@ -53,7 +53,7 @@ export default function LoginForm() {
 
       if (!data?.session) throw new Error("Authentication failed");
       
-      // Ensure the session actually got written to storage
+      // Critical: Ensure the session actually got written to storage before navigation
       await supabase.auth.getSession();
 
       toast.success("Welcome back!");

@@ -24,6 +24,7 @@ export function clearAuthenticatedState(): void {
 export async function isAuthenticated(): Promise<boolean> {
   try {
     const { data } = await supabase.auth.getSession();
+    console.log("isAuthenticated check:", !!data.session);
     // If we have a session, the user is authenticated
     return !!data.session;
   } catch (error) {

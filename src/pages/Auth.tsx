@@ -13,12 +13,16 @@ const Auth = () => {
 
   // Check if user is already authenticated
   useEffect(() => {
+    console.log("Auth page: Checking if user is already authenticated");
+    console.log("Auth page: location.state =", location.state);
+    
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) {
         const from = (location.state as any)?.from || "/admin";
         console.log("Auth page: User already authenticated, redirecting to:", from);
         navigate(from, { replace: true });
       } else {
+        console.log("Auth page: No session found, showing login form");
         setLoading(false);
       }
     });
