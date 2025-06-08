@@ -106,12 +106,6 @@ export const validateStep = (
       } else if (!formState.brandingGuidelinesFilesLink.trim()) {
         isValid = false;
         errorMessage = 'Please provide a link to your branding guidelines or enter N/A if not applicable.';
-      } else if (formState.credibilityMarkers.length === 0) {
-        isValid = false;
-        errorMessage = 'Please select at least one credibility marker.';
-      } else if (formState.credibilityMarkers.includes('other') && !formState.otherCredibilityMarker.trim()) {
-        isValid = false;
-        errorMessage = 'Please specify the other credibility marker.';
       } else if (!formState.speakerBio.trim()) {
         isValid = false;
         errorMessage = 'Please provide your speaker bio.';

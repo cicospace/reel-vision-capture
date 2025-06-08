@@ -4,7 +4,22 @@ export function prepareSubmissionData(formData: any) {
   // Ensure arrays are proper arrays and not empty
   const tones = Array.isArray(formData.tones) ? formData.tones : [];
   const footageTypes = Array.isArray(formData.footageTypes) ? formData.footageTypes : [];
-  const credibilityMarkers = Array.isArray(formData.credibilityMarkers) ? formData.credibilityMarkers : [];
+  
+  // Handle credibilityMarkers - convert from string (textarea) to array
+  let credibilityMarkers: string[] = [];
+  if (typeof formData.credibilityMarkers === 'string' && formData.credibilityMarkers.trim()) {
+    // Split by newlines, trim each line, and filter out empty lines
+    credibilityMarkers = formData.credibilityMarkers
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line.length > 0);
+  }
+  
+  // If no credibility markers or only contains variations of "N/A", provide a default
+  if (credibilityMarkers.length === 0 || 
+      (credibilityMarkers.length === 1 && credibilityMarkers[0].toLowerCase().includes('n/a'))) {
+    credibilityMarkers = ['N/A'];
+  }
   
   // Create a clean submission object with only the fields expected by the database
   // Always provide fallback values for required fields to prevent null/undefined issues
