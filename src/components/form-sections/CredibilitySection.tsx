@@ -68,12 +68,7 @@ const CredibilitySection: React.FC = () => {
         </div>
         
         <div>
-          <Label className="input-label">
-            <div>
-              <div className="font-semibold">List any achievements or proof points you want showcased—one per line.</div>
-              <div className="mt-1">Think: best-selling author (book title), TEDx speaker, featured in &lt;news outlet&gt;, Fortune 500 clients, major awards, impressive stats, etc. Leave blank if none apply.</div>
-            </div>
-          </Label>
+          <Label className="input-label">List any achievements or proof points you want showcased—one per line.</Label>
           <Textarea
             value={formState.credibilityMarkers}
             onChange={(e) => updateForm('credibilityMarkers', e.target.value)}
