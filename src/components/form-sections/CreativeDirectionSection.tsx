@@ -35,13 +35,12 @@ const CreativeDirectionSection: React.FC = () => {
         </div>
         
         <div>
-          <Label className="input-label">List the clips that MUST be included (Google Doc link preferred) *</Label>
+          <Label className="input-label">Have specific moments you need in the reel? Drop the filenames or timestamps here so we don't miss them. If you're happy to let us curate the highlights, just leave this blank.</Label>
           <Textarea
             value={formState.nonNegotiableClips}
             onChange={(e) => updateForm('nonNegotiableClips', e.target.value)}
-            placeholder="Add a Google Doc link with your required clips and timestamps, or enter N/A if not applicable..."
+            placeholder="Drop filenames, timestamps, or specific moments you want included, or leave blank if you trust our curation..."
             className="text-input h-32"
-            required
           />
         </div>
       </div>
