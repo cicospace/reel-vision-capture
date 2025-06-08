@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Clapperboard, Info } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,7 +20,12 @@ const CreativeDirectionSection: React.FC = () => {
       </div>
       <div className="space-y-6">
         <div>
-          <Label className="input-label">Already have a specific structure in mind? Upload or paste your outline here so we can match your vision. If you'd rather we craft the narrative from scratch, just leave this blank — we've got you.</Label>
+          <Label className="input-label">
+            <div>
+              <div>Already have a specific structure in mind? Upload or paste your outline here so we can match your vision.</div>
+              <div className="mt-1">If you'd rather we craft the narrative from scratch, just leave this blank — we've got you.</div>
+            </div>
+          </Label>
           <Textarea
             value={formState.scriptStructure}
             onChange={(e) => updateForm('scriptStructure', e.target.value)}
