@@ -4,15 +4,7 @@ import { User, Info } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import CheckboxGroup from "@/components/CheckboxGroup";
 import { useFormContext } from "@/context/FormContext";
-
-const credibilityOptions = [
-  { id: 'author', label: 'Best-Selling Author' },
-  { id: 'inc5000', label: 'Inc 5000 Honoree' },
-  { id: 'tedx', label: 'TEDx Speaker' },
-  { id: 'media', label: 'Featured in Major Media' },
-];
 
 const CredibilitySection: React.FC = () => {
   const { formState, updateForm } = useFormContext();
@@ -75,16 +67,20 @@ const CredibilitySection: React.FC = () => {
           <p className="text-sm text-muted-foreground mt-1">Share your brand guidelines to ensure we maintain your brand consistency.</p>
         </div>
         
-        <CheckboxGroup
-          label="Which credibility markers apply to you? *"
-          options={credibilityOptions}
-          selectedOptions={formState.credibilityMarkers}
-          onChange={(value) => updateForm('credibilityMarkers', value)}
-          otherOption={true}
-          otherValue={formState.otherCredibilityMarker}
-          onOtherChange={(value) => updateForm('otherCredibilityMarker', value)}
-          required={true}
-        />
+        <div>
+          <Label className="input-label">
+            <div>
+              <div className="font-semibold">List any achievements or proof points you want showcased—one per line.</div>
+              <div className="mt-1">Think: best-selling author (book title), TEDx speaker, featured in &lt;news outlet&gt;, Fortune 500 clients, major awards, impressive stats, etc. Leave blank if none apply.</div>
+            </div>
+          </Label>
+          <Textarea
+            value={formState.credibilityMarkers}
+            onChange={(e) => updateForm('credibilityMarkers', e.target.value)}
+            placeholder="Best-selling author: [Book Title]&#10;TEDx Speaker&#10;Featured in Forbes&#10;Worked with Fortune 500 companies&#10;Winner of [Award Name]&#10;[Your impressive stats/achievements]"
+            className="text-input h-32"
+          />
+        </div>
         
         <div>
           <Label className="input-label">Your current speaker bio (Google Doc link preferred) *</Label>

@@ -1,4 +1,3 @@
-
 export type ReelExample = {
   id: string;
   link: string;
@@ -26,8 +25,7 @@ export type FormState = {
   testimonials: string;
   logoFolderLink: string;
   deckFilesLink: string;
-  credibilityMarkers: string[];
-  otherCredibilityMarker: string;
+  credibilityMarkers: string;
   speakerBio: string;
   speakerBioFilesLink: string;
   brandingGuidelinesFilesLink: string;
@@ -56,8 +54,7 @@ export const initialFormState: FormState = {
   testimonials: '',
   logoFolderLink: '',
   deckFilesLink: '',
-  credibilityMarkers: [],
-  otherCredibilityMarker: '',
+  credibilityMarkers: '',
   speakerBio: '',
   speakerBioFilesLink: '',
   brandingGuidelinesFilesLink: '',
