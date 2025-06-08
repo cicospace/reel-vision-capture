@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Admin from "./pages/Admin";
 import Auth from "./pages/Auth";
 import SubmissionDetail from "./pages/SubmissionDetail";
+import Confirmation from "./pages/Confirmation";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -37,6 +38,7 @@ const App = () => {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/confirmation" element={<Confirmation />} />
             <Route path="/admin" element={
               <ProtectedRoute>
                 <Admin />

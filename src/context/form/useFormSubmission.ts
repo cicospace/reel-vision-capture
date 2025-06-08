@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FormState } from './types';
 import { saveFormToSupabase } from "@/utils/formSubmission";
 import { toast } from "sonner";
@@ -10,6 +11,7 @@ export const useFormSubmission = (
   updateForm: (key: keyof FormState, value: any) => void
 ) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,19 +74,11 @@ export const useFormSubmission = (
         toast.warning("Partial success", {
           description: error.message,
         });
-      } else {
-        // Show full success message
-        toast.success("Form submitted successfully!", {
-          description: "Your submission has been saved. We'll review it shortly.",
-        });
       }
       
-      // Clear form data and reset form
+      // Clear form data and navigate to confirmation page
       clearStoredFormData();
-      setFormState({
-        ...formState,
-        step: 1,
-      });
+      navigate('/confirmation');
       
     } catch (error: any) {
       console.error('Unexpected submission error:', error);
