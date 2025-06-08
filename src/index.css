@@ -99,7 +99,7 @@
   
   /* Force text color for all form inputs */
   input, textarea, select {
-    @apply text-white font-sans;
+    @apply text-white;
     color: white !important;
   }
   
@@ -112,7 +112,7 @@
 
 @layer components {
   .section-title {
-    @apply text-xl font-semibold text-foreground flex items-center gap-2 mb-4 font-sans;
+    @apply text-xl font-semibold text-foreground flex items-center gap-2 mb-4;
   }
   
   .form-section {
@@ -120,15 +120,15 @@
   }
   
   .input-label {
-    @apply block text-sm font-medium text-foreground mb-1 font-sans;
+    @apply block text-sm font-medium text-foreground mb-1;
   }
   
   .text-input {
-    @apply w-full border border-input rounded-md px-3 py-2 bg-background text-white focus:outline-none focus:ring-2 focus:ring-accent font-sans;
+    @apply w-full border border-input rounded-md px-3 py-2 bg-background text-white focus:outline-none focus:ring-2 focus:ring-accent;
   }
   
   .progress-step {
-    @apply w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold font-sans;
+    @apply w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold;
   }
   
   .progress-step.active {
