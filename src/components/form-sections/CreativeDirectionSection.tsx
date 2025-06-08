@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Clapperboard, Info } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
@@ -20,13 +19,12 @@ const CreativeDirectionSection: React.FC = () => {
       </div>
       <div className="space-y-6">
         <div>
-          <Label className="input-label">Share any general script or flow you'd like the reel to follow (Google Doc link preferred) *</Label>
+          <Label className="input-label">Already have a specific structure in mind? Upload or paste your outline here so we can match your vision. If you'd rather we craft the narrative from scratch, just leave this blank — we've got you.</Label>
           <Textarea
             value={formState.scriptStructure}
             onChange={(e) => updateForm('scriptStructure', e.target.value)}
-            placeholder="Add a Google Doc link with your vision for the reel structure and flow, or enter N/A if not applicable..."
+            placeholder="Add a Google Doc link with your vision for the reel structure and flow, or leave blank if you'd like us to create the narrative..."
             className="text-input h-32"
-            required
           />
         </div>
         
