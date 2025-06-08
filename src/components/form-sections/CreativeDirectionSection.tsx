@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { Clapperboard, Info } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
