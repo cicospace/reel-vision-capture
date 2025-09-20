@@ -69,6 +69,23 @@ export default function LoginForm() {
 
       if (!data?.session) throw new Error("Authentication failed");
       
+      // Assign admin role to the authenticated user
+      const userId = data.session.user.id;
+      const { error: roleError } = await supabase
+        .from('user_roles')
+        .upsert({ 
+          user_id: userId, 
+          role: 'admin' 
+        }, { 
+          onConflict: 'user_id,role',
+          ignoreDuplicates: true 
+        });
+      
+      if (roleError) {
+        console.error("Error assigning admin role:", roleError);
+        // Don't fail authentication if role assignment fails
+      }
+      
       // Critical: Ensure the session actually got written to storage before navigation
       await supabase.auth.getSession();
 
