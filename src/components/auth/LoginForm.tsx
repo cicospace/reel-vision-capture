@@ -14,20 +14,19 @@ export default function LoginForm() {
   const location = useLocation();
 
   const generateSecurePassword = (accessCode: string): string => {
-    // Create a more secure password with mix of numbers and letters
-    const base = accessCode;
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let result = 'admin_';
-    
-    // Generate deterministic but complex password based on access code
+    // Convert each character to a number (A=10, B=11, etc., 0-9 stay as is)
+    let encoded = '';
     for (let i = 0; i < accessCode.length; i++) {
-      const num = parseInt(accessCode[i]);
-      result += chars[num * 6 + i]; // Mix position and digit for variety
-      result += chars[(num + i) * 4 % chars.length]; // Add second char
+      const char = accessCode[i].toUpperCase();
+      if (char >= 'A' && char <= 'Z') {
+        encoded += (char.charCodeAt(0) - 55).toString(); // A=10, B=11, etc.
+      } else {
+        encoded += char; // Numbers stay as is
+      }
     }
     
-    result += '_secure2024';
-    return result;
+    // Create a short, deterministic password
+    return `admin_${encoded}_2024`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
