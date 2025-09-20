@@ -13,13 +13,30 @@ export default function LoginForm() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const generateSecurePassword = (accessCode: string): string => {
+    // Create a more secure password with mix of numbers and letters
+    const base = accessCode;
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = 'admin_';
+    
+    // Generate deterministic but complex password based on access code
+    for (let i = 0; i < accessCode.length; i++) {
+      const num = parseInt(accessCode[i]);
+      result += chars[num * 6 + i]; // Mix position and digit for variety
+      result += chars[(num + i) * 4 % chars.length]; // Add second char
+    }
+    
+    result += '_secure2024';
+    return result;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateAccessCode(code)) {
       return toast.error("Invalid code");
     }
     setLoading(true);
-    const password = `${code}_supabase`;
+    const password = generateSecurePassword(code);
 
     try {
       let { data, error } = await supabase.auth.signInWithPassword({
