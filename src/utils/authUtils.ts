@@ -2,10 +2,10 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export const ADMIN_EMAIL = 'admin@example.com';
-export const SECURE_ACCESS_CODE = '739281';
+export const SECURE_ACCESS_CODE = 'A7B9C2';
 
 export function validateAccessCode(code: string): boolean {
-  return code === SECURE_ACCESS_CODE;
+  return code.toUpperCase() === SECURE_ACCESS_CODE;
 }
 
 // These functions are now primarily used for backward compatibility
